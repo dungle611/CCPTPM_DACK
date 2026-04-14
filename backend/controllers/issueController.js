@@ -8,10 +8,13 @@ const getIssues = async (req, res) => {
     if (req.query.status) filter.status = req.query.status;
     if (req.query.assignee) filter.assignee = req.query.assignee;
     if (req.query.parentId) filter.parentId = req.query.parentId;
+    if (req.query.sprint) filter.sprint = req.query.sprint; // Cho phép lọc theo Sprint
+    if (req.query.sprint === "null") filter.sprint = null; // Lọc các thẻ Backlog (không có Sprint)
 
     const issues = await Issue.find(filter)
       .populate("assignee", "name email avatar")
       .populate("parentId", "title type")
+      .populate("sprint", "name status")
       .sort({ order: 1, createdAt: -1 });
 
     res.json(issues);
@@ -25,7 +28,8 @@ const getIssueById = async (req, res) => {
   try {
     const issue = await Issue.findById(req.params.id)
       .populate("assignee", "name email avatar")
-      .populate("parentId", "title type");
+      .populate("parentId", "title type")
+      .populate("sprint", "name status");
 
     if (!issue) {
       return res.status(404).json({ message: "Không tìm thấy Issue" });
@@ -45,7 +49,8 @@ const createIssue = async (req, res) => {
     // Populate để trả về đầy đủ thông tin
     const populatedIssue = await Issue.findById(savedIssue._id)
       .populate("assignee", "name email avatar")
-      .populate("parentId", "title type");
+      .populate("parentId", "title type")
+      .populate("sprint", "name status");
 
     res.status(201).json(populatedIssue);
   } catch (error) {
@@ -61,7 +66,8 @@ const updateIssue = async (req, res) => {
       runValidators: true,
     })
       .populate("assignee", "name email avatar")
-      .populate("parentId", "title type");
+      .populate("parentId", "title type")
+      .populate("sprint", "name status");
 
     if (!issue) {
       return res.status(404).json({ message: "Không tìm thấy Issue" });
