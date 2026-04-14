@@ -2,26 +2,27 @@
 
 /* ===== Global Reset & Design Tokens ===== */
 :root {
-  --color-bg-primary: #1a1a2e;
-  --color-bg-secondary: #16213e;
-  --color-bg-card: #1e293b;
-  --color-bg-hover: #253553;
-  --color-bg-modal: #0f172a;
-  --color-bg-input: #1e293b;
-  --color-border: #334155;
-  --color-border-focus: #6366f1;
-  --color-text-primary: #f1f5f9;
-  --color-text-secondary: #94a3b8;
-  --color-text-muted: #64748b;
-  --color-accent: #6366f1;
-  --color-accent-hover: #818cf8;
-  --color-success: #22c55e;
-  --color-warning: #f59e0b;
-  --color-danger: #ef4444;
-  --color-epic: #a855f7;
-  --color-story: #22c55e;
-  --color-task: #3b82f6;
-  --sidebar-width: 260px;
+  /* Jira-like Light Theme */
+  --color-bg-primary: #ffffff;
+  --color-bg-secondary: #f4f5f7;
+  --color-bg-card: #ffffff;
+  --color-bg-hover: #ebecf0;
+  --color-bg-modal: #ffffff;
+  --color-bg-input: #f4f5f7;
+  --color-border: #dfe1e6;
+  --color-border-focus: #4c9aff;
+  --color-text-primary: #172b4d;
+  --color-text-secondary: #5e6c84;
+  --color-text-muted: #97a0af;
+  --color-accent: #0052cc;
+  --color-accent-hover: #0065ff;
+  --color-success: #36b37e;
+  --color-warning: #ff991f;
+  --color-danger: #de350b;
+  --color-epic: #6554c0;
+  --color-story: #36b37e;
+  --color-task: #4c9aff;
+  --sidebar-width: 240px;
   --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 }
 
