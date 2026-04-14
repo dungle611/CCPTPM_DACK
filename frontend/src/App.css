@@ -340,6 +340,22 @@
   display: flex;
   flex-direction: column;
   gap: 8px;
+  min-height: 80px;
+  transition: background-color 0.2s ease;
+}
+
+/* Drag-over: Khi kéo thẻ vào vùng cột đích */
+.board-column-cards.drag-over {
+  background: rgba(0, 82, 204, 0.06);
+  border-radius: 0 0 6px 6px;
+}
+
+/* Is-dragging: Thẻ đang được kéo */
+.issue-card.is-dragging {
+  box-shadow: 0 8px 24px rgba(9, 30, 66, 0.25);
+  transform: rotate(2deg);
+  opacity: 0.9;
+  background: #ffffff;
 }
 
 /* ===== Issue Card ===== */
