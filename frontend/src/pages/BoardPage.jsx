@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 import useIssueStore from "../store/useIssueStore";
+import useSprintStore from "../store/useSprintStore";
 
 const COLUMNS = [
   { key: "Todo", label: "Cần làm", indicator: "todo" },
@@ -103,21 +104,25 @@ const IssueCard = ({ issue, onEdit, onDelete, index }) => {
 };
 
 // Component trang Board chính
-const BoardPage = ({ onCreateIssue, onEditIssue, onDeleteIssue }) => {
+const BoardPage = ({ onCreateIssue, onEditIssue, onDeleteIssue, onShowToast }) => {
   const issues = useIssueStore((state) => state.issues);
   const loading = useIssueStore((state) => state.loading);
   const moveIssue = useIssueStore((state) => state.moveIssue);
   const reorderIssues = useIssueStore((state) => state.reorderIssues);
+  const updateSprint = useSprintStore((state) => state.updateSprint);
   const [updatingId, setUpdatingId] = useState(null);
 
-  // Đếm số issue theo status
+
+  const activeSprintId = issues.find(i => i.sprint && i.sprint.status === "Active")?.sprint?._id || null;
+
+  // Đếm số issue theo status (chỉ tính Active Sprint)
   const getCountByStatus = (status) => {
-    return issues.filter((i) => i.status === status).length;
+    return issues.filter((i) => i.status === status && i.sprint && i.sprint._id === activeSprintId).length;
   };
 
-  // Lấy issues theo status
+  // Lấy issues theo status (chỉ tính Active Sprint)
   const getIssuesByStatus = (status) => {
-    return issues.filter((i) => i.status === status);
+    return issues.filter((i) => i.status === status && i.sprint && i.sprint._id === activeSprintId);
   };
 
   // Xử lý sự kiện khi kéo thả xong
@@ -153,6 +158,22 @@ const BoardPage = ({ onCreateIssue, onEditIssue, onDeleteIssue }) => {
     }
   };
 
+  const handleCompleteSprint = async () => {
+    if (activeSprintId && window.confirm("Bạn có chắc chắn muốn hoàn thành Sprint này?")) {
+      try {
+        await updateSprint(activeSprintId, { status: "Closed" });
+        if (onShowToast) {
+          onShowToast({ type: "success", message: `Đã hoàn thành Sprint thành công!` });
+        }
+      } catch (error) {
+        console.error("Lỗi hoàn thành Sprint:", error);
+        if (onShowToast) {
+          onShowToast({ type: "error", message: `Lỗi: ${error.message}` });
+        }
+      }
+    }
+  };
+
   return (
     <div className="board-page">
       {/* Header */}
@@ -162,24 +183,34 @@ const BoardPage = ({ onCreateIssue, onEditIssue, onDeleteIssue }) => {
         </div>
         <div className="board-header-top">
           <h1 className="board-title">Kanban Board</h1>
-          <button
-            className="board-header-btn"
-            onClick={onCreateIssue}
-            id="board-create-issue-btn"
-          >
-            <svg
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2.5"
-              strokeLinecap="round"
-              strokeLinejoin="round"
+          <div style={{ display: 'flex', gap: '8px' }}>
+            {activeSprintId && (
+              <button
+                className="sprint-btn primary"
+                onClick={handleCompleteSprint}
+              >
+                Complete Sprint
+              </button>
+            )}
+            <button
+              className="board-header-btn"
+              onClick={onCreateIssue}
+              id="board-create-issue-btn"
             >
-              <line x1="12" y1="5" x2="12" y2="19" />
-              <line x1="5" y1="12" x2="19" y2="12" />
-            </svg>
-            Tạo mới
-          </button>
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <line x1="12" y1="5" x2="12" y2="19" />
+                <line x1="5" y1="12" x2="19" y2="12" />
+              </svg>
+              Tạo mới
+            </button>
+          </div>
         </div>
 
         {/* Stats */}
@@ -194,68 +225,74 @@ const BoardPage = ({ onCreateIssue, onEditIssue, onDeleteIssue }) => {
         </div>
       </div>
 
-      {/* Board Columns - Bọc trong DragDropContext */}
-      <DragDropContext onDragEnd={handleDragEnd}>
-        <div className="board-columns">
-          {COLUMNS.map((col) => {
-            const colIssues = getIssuesByStatus(col.key);
-            return (
-              <div className="board-column" key={col.key} id={`column-${col.key}`}>
-                <div className="board-column-header">
-                  <div className="board-column-title-group">
-                    <div className={`board-column-indicator ${col.indicator}`} />
-                    <span className="board-column-title">{col.label}</span>
-                  </div>
-                  <span className="board-column-count">{colIssues.length}</span>
-                </div>
-
-                {/* Droppable: Vùng thả cho mỗi cột */}
-                <Droppable droppableId={col.key}>
-                  {(provided, snapshot) => (
-                    <div
-                      className={`board-column-cards ${snapshot.isDraggingOver ? "drag-over" : ""}`}
-                      ref={provided.innerRef}
-                      {...provided.droppableProps}
-                    >
-                      {loading ? (
-                        <div className="column-empty">
-                          <p>Đang tải...</p>
-                        </div>
-                      ) : colIssues.length === 0 && !snapshot.isDraggingOver ? (
-                        <div className="column-empty">
-                          <svg
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="1.5"
-                          >
-                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
-                            <line x1="12" y1="8" x2="12" y2="16" />
-                            <line x1="8" y1="12" x2="16" y2="12" />
-                          </svg>
-                          <p>Chưa có Issue nào</p>
-                        </div>
-                      ) : (
-                        colIssues.map((issue, index) => (
-                          <IssueCard
-                            key={issue._id}
-                            issue={issue}
-                            index={index}
-                            onEdit={onEditIssue}
-                            onDelete={onDeleteIssue}
-                          />
-                        ))
-                      )}
-                      {/* Placeholder giữ chỗ khi kéo */}
-                      {provided.placeholder}
-                    </div>
-                  )}
-                </Droppable>
-              </div>
-            );
-          })}
+      {!activeSprintId ? (
+        <div className="no-active-sprint">
+          <h2>Chuẩn bị bắt tay vào việc!</h2>
+          <p>Hiện chưa có Sprint nào đang chạy (Active). Vui lòng chuyển sang thẻ Backlog để lên kế hoạch và Start một Sprint.</p>
         </div>
-      </DragDropContext>
+      ) : (
+        <DragDropContext onDragEnd={handleDragEnd}>
+          <div className="board-columns">
+            {COLUMNS.map((col) => {
+              const colIssues = getIssuesByStatus(col.key);
+              return (
+                <div className="board-column" key={col.key} id={`column-${col.key}`}>
+                  <div className="board-column-header">
+                    <div className="board-column-title-group">
+                      <div className={`board-column-indicator ${col.indicator}`} />
+                      <span className="board-column-title">{col.label}</span>
+                    </div>
+                    <span className="board-column-count">{colIssues.length}</span>
+                  </div>
+
+                  {/* Droppable: Vùng thả cho mỗi cột */}
+                  <Droppable droppableId={col.key}>
+                    {(provided, snapshot) => (
+                      <div
+                        className={`board-column-cards ${snapshot.isDraggingOver ? "drag-over" : ""}`}
+                        ref={provided.innerRef}
+                        {...provided.droppableProps}
+                      >
+                        {loading ? (
+                          <div className="column-empty">
+                            <p>Đang tải...</p>
+                          </div>
+                        ) : colIssues.length === 0 && !snapshot.isDraggingOver ? (
+                          <div className="column-empty">
+                            <svg
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              strokeWidth="1.5"
+                            >
+                              <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+                              <line x1="12" y1="8" x2="12" y2="16" />
+                              <line x1="8" y1="12" x2="16" y2="12" />
+                            </svg>
+                            <p>Chưa có Issue nào</p>
+                          </div>
+                        ) : (
+                          colIssues.map((issue, index) => (
+                            <IssueCard
+                              key={issue._id}
+                              issue={issue}
+                              index={index}
+                              onEdit={onEditIssue}
+                              onDelete={onDeleteIssue}
+                            />
+                          ))
+                        )}
+                        {/* Placeholder giữ chỗ khi kéo */}
+                        {provided.placeholder}
+                      </div>
+                    )}
+                  </Droppable>
+                </div>
+              );
+            })}
+          </div>
+        </DragDropContext>
+      )}
     </div>
   );
 };

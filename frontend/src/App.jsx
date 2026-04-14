@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import Sidebar from "./components/Sidebar";
 import BoardPage from "./pages/BoardPage";
+import BacklogPage from "./pages/BacklogPage";
 import IssuesListPage from "./pages/IssuesListPage";
 import CreateIssueModal from "./components/CreateIssueModal";
 import DeleteConfirmModal from "./components/DeleteConfirmModal";
@@ -78,6 +79,16 @@ function App() {
             onCreateIssue={handleCreate}
             onEditIssue={handleEdit}
             onDeleteIssue={handleDeleteRequest}
+            onShowToast={setToast}
+          />
+        );
+      case "backlog":
+        return (
+          <BacklogPage
+            onCreateIssue={handleCreate}
+            onEditIssue={handleEdit}
+            onDeleteIssue={handleDeleteRequest}
+            onShowToast={setToast}
           />
         );
       case "board":
@@ -87,6 +98,7 @@ function App() {
             onCreateIssue={handleCreate}
             onEditIssue={handleEdit}
             onDeleteIssue={handleDeleteRequest}
+            onShowToast={setToast}
           />
         );
     }

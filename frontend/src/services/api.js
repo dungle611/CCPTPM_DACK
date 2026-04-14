@@ -44,4 +44,20 @@ export const userService = {
   delete: (id) => api.delete(`/users/${id}`),
 };
 
+// ==================== SPRINT API ====================
+
+export const sprintService = {
+  // Lấy tất cả Sprints
+  getAll: () => api.get("/sprints"),
+
+  // Tạo mới Sprint
+  create: (data) => api.post("/sprints", data),
+
+  // Cập nhật Sprint
+  update: (id, data) => api.put(`/sprints/${id}`, data),
+
+  // Xóa Sprint
+  delete: (id) => api.delete(`/sprints/${id}`),
+};
+
 export default api;
