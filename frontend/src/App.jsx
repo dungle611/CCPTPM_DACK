@@ -1,12 +1,14 @@
 import { useState, useEffect } from "react";
 import Sidebar from "./components/Sidebar";
 import BoardPage from "./pages/BoardPage";
+import IssuesListPage from "./pages/IssuesListPage";
 import CreateIssueModal from "./components/CreateIssueModal";
 import useIssueStore from "./store/useIssueStore";
 import useUserStore from "./store/useUserStore";
 import "./App.css";
 
 function App() {
+  const [activePage, setActivePage] = useState("board");
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const fetchIssues = useIssueStore((state) => state.fetchIssues);
   const fetchUsers = useUserStore((state) => state.fetchUsers);
@@ -17,11 +19,26 @@ function App() {
     fetchUsers();
   }, [fetchIssues, fetchUsers]);
 
+  // Render trang hiện tại
+  const renderPage = () => {
+    switch (activePage) {
+      case "issues":
+        return <IssuesListPage onCreateIssue={() => setIsCreateModalOpen(true)} />;
+      case "board":
+      default:
+        return <BoardPage onCreateIssue={() => setIsCreateModalOpen(true)} />;
+    }
+  };
+
   return (
     <div className="app-layout">
-      <Sidebar onCreateIssue={() => setIsCreateModalOpen(true)} />
+      <Sidebar
+        onCreateIssue={() => setIsCreateModalOpen(true)}
+        activePage={activePage}
+        onNavigate={setActivePage}
+      />
       <main className="main-content">
-        <BoardPage onCreateIssue={() => setIsCreateModalOpen(true)} />
+        {renderPage()}
       </main>
 
       {/* Modal Tạo Issue */}

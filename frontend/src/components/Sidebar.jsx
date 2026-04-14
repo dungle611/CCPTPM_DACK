@@ -1,5 +1,5 @@
 // Sidebar.jsx - Thanh điều hướng bên trái kiểu Jira
-const Sidebar = ({ onCreateIssue }) => {
+const Sidebar = ({ onCreateIssue, activePage, onNavigate }) => {
   return (
     <aside className="sidebar">
       {/* Logo */}
@@ -18,7 +18,11 @@ const Sidebar = ({ onCreateIssue }) => {
       <nav className="sidebar-nav">
         <div className="sidebar-nav-label">Lập kế hoạch</div>
 
-        <button className="sidebar-nav-item active" id="nav-board">
+        <button
+          className={`sidebar-nav-item ${activePage === "board" ? "active" : ""}`}
+          onClick={() => onNavigate("board")}
+          id="nav-board"
+        >
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <rect x="3" y="3" width="7" height="7" rx="1" />
             <rect x="14" y="3" width="7" height="7" rx="1" />
@@ -28,7 +32,11 @@ const Sidebar = ({ onCreateIssue }) => {
           Board
         </button>
 
-        <button className="sidebar-nav-item" id="nav-backlog">
+        <button
+          className={`sidebar-nav-item ${activePage === "backlog" ? "active" : ""}`}
+          onClick={() => onNavigate("backlog")}
+          id="nav-backlog"
+        >
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <line x1="8" y1="6" x2="21" y2="6" />
             <line x1="8" y1="12" x2="21" y2="12" />
@@ -40,7 +48,11 @@ const Sidebar = ({ onCreateIssue }) => {
           Backlog
         </button>
 
-        <button className="sidebar-nav-item" id="nav-timeline">
+        <button
+          className={`sidebar-nav-item ${activePage === "timeline" ? "active" : ""}`}
+          onClick={() => onNavigate("timeline")}
+          id="nav-timeline"
+        >
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
           </svg>
@@ -49,7 +61,11 @@ const Sidebar = ({ onCreateIssue }) => {
 
         <div className="sidebar-nav-label" style={{ marginTop: "20px" }}>Quản lý</div>
 
-        <button className="sidebar-nav-item" id="nav-issues">
+        <button
+          className={`sidebar-nav-item ${activePage === "issues" ? "active" : ""}`}
+          onClick={() => onNavigate("issues")}
+          id="nav-issues"
+        >
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
             <polyline points="14 2 14 8 20 8" />
@@ -59,7 +75,11 @@ const Sidebar = ({ onCreateIssue }) => {
           Issues
         </button>
 
-        <button className="sidebar-nav-item" id="nav-members">
+        <button
+          className={`sidebar-nav-item ${activePage === "members" ? "active" : ""}`}
+          onClick={() => onNavigate("members")}
+          id="nav-members"
+        >
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
             <circle cx="9" cy="7" r="4" />
@@ -71,8 +91,8 @@ const Sidebar = ({ onCreateIssue }) => {
       </nav>
 
       {/* Create Button */}
-      <button 
-        className="sidebar-create-btn" 
+      <button
+        className="sidebar-create-btn"
         onClick={onCreateIssue}
         id="sidebar-create-issue-btn"
       >
