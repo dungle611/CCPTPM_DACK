@@ -37,6 +37,11 @@ const issueSchema = new mongoose.Schema(
       ref: "Issue",
       default: null, // Story thuộc Epic nào, Task thuộc Story nào
     },
+    sprint: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Sprint",
+      default: null, // Thuộc về Sprint nào, null = nằm trơ trọi ở Backlog
+    },
     order: {
       type: Number,
       default: 0, // Thứ tự hiển thị trên cột Board (phục vụ kéo thả)

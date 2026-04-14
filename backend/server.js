@@ -18,10 +18,12 @@ mongoose
 // Import Routes
 const issueRoutes = require("./routes/issueRoutes");
 const userRoutes = require("./routes/userRoutes");
+const sprintRoutes = require("./routes/sprintRoutes");
 
 // Sử dụng Routes
 app.use("/api/issues", issueRoutes);
 app.use("/api/users", userRoutes);
+app.use("/api/sprints", sprintRoutes);
 
 // Route kiểm tra server
 app.get("/", (req, res) => {
