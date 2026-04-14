@@ -2,10 +2,14 @@ import { useState, useEffect, useRef } from "react";
 import useIssueStore from "../store/useIssueStore";
 import useUserStore from "../store/useUserStore";
 
-const CreateIssueModal = ({ isOpen, onClose }) => {
+// Modal dùng chung cho cả Tạo mới và Chỉnh sửa Issue
+const CreateIssueModal = ({ isOpen, onClose, editIssue = null }) => {
   const addIssue = useIssueStore((state) => state.addIssue);
+  const updateIssue = useIssueStore((state) => state.updateIssue);
   const issues = useIssueStore((state) => state.issues);
   const users = useUserStore((state) => state.users);
+
+  const isEditMode = !!editIssue;
 
   const [formData, setFormData] = useState({
     title: "",
@@ -35,9 +39,19 @@ const CreateIssueModal = ({ isOpen, onClose }) => {
     }
   }, [toast]);
 
-  // Reset form khi đóng modal  
+  // Load dữ liệu Issue khi mở ở chế độ Edit, reset khi đóng
   useEffect(() => {
-    if (!isOpen) {
+    if (isOpen && editIssue) {
+      setFormData({
+        title: editIssue.title || "",
+        description: editIssue.description || "",
+        type: editIssue.type || "Task",
+        status: editIssue.status || "Todo",
+        priority: editIssue.priority || "Medium",
+        assignee: editIssue.assignee?._id || editIssue.assignee || "",
+        parentId: editIssue.parentId?._id || editIssue.parentId || "",
+      });
+    } else if (!isOpen) {
       setFormData({
         title: "",
         description: "",
@@ -48,7 +62,7 @@ const CreateIssueModal = ({ isOpen, onClose }) => {
         parentId: "",
       });
     }
-  }, [isOpen]);
+  }, [isOpen, editIssue]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -70,7 +84,7 @@ const CreateIssueModal = ({ isOpen, onClose }) => {
 
     setLoading(true);
     try {
-      // Chuẩn bị dữ liệu gửi đi - chỉ gửi các trường có giá trị
+      // Chuẩn bị dữ liệu gửi đi
       const submitData = {
         title: formData.title.trim(),
         description: formData.description.trim(),
@@ -81,37 +95,47 @@ const CreateIssueModal = ({ isOpen, onClose }) => {
 
       if (formData.assignee) {
         submitData.assignee = formData.assignee;
+      } else {
+        submitData.assignee = null;
       }
       if (formData.parentId) {
         submitData.parentId = formData.parentId;
+      } else {
+        submitData.parentId = null;
       }
 
-      await addIssue(submitData);
-      setToast({ type: "success", message: "Tạo Issue thành công! 🎉" });
+      if (isEditMode) {
+        await updateIssue(editIssue._id, submitData);
+        setToast({ type: "success", message: "Cập nhật Issue thành công! ✏️" });
+      } else {
+        await addIssue(submitData);
+        setToast({ type: "success", message: "Tạo Issue thành công! 🎉" });
+      }
 
-      // Đóng modal sau khi tạo thành công
+      // Đóng modal sau khi thành công
       setTimeout(() => {
         onClose();
       }, 600);
     } catch (error) {
       setToast({
         type: "error",
-        message: error?.response?.data?.message || "Có lỗi xảy ra khi tạo Issue!",
+        message: error?.response?.data?.message || `Có lỗi xảy ra khi ${isEditMode ? "cập nhật" : "tạo"} Issue!`,
       });
     } finally {
       setLoading(false);
     }
   };
 
-  // Lọc danh sách parent issues - Epic có thể là parent của Story, Story có thể là parent của Task
+  // Lọc danh sách parent issues
   const getParentOptions = () => {
+    const currentId = editIssue?._id;
     if (formData.type === "Story") {
-      return issues.filter((i) => i.type === "Epic");
+      return issues.filter((i) => i.type === "Epic" && i._id !== currentId);
     }
     if (formData.type === "Task") {
-      return issues.filter((i) => i.type === "Story" || i.type === "Epic");
+      return issues.filter((i) => (i.type === "Story" || i.type === "Epic") && i._id !== currentId);
     }
-    return []; // Epic không có parent
+    return [];
   };
 
   if (!isOpen) return null;
@@ -147,13 +171,20 @@ const CreateIssueModal = ({ isOpen, onClose }) => {
           {/* Header */}
           <div className="modal-header">
             <div className="modal-title">
-              <div className="modal-title-icon">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <line x1="12" y1="5" x2="12" y2="19" />
-                  <line x1="5" y1="12" x2="19" y2="12" />
-                </svg>
+              <div className={`modal-title-icon ${isEditMode ? "edit-mode" : ""}`}>
+                {isEditMode ? (
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+                  </svg>
+                ) : (
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <line x1="12" y1="5" x2="12" y2="19" />
+                    <line x1="5" y1="12" x2="19" y2="12" />
+                  </svg>
+                )}
               </div>
-              Tạo Issue mới
+              {isEditMode ? "Chỉnh sửa Issue" : "Tạo Issue mới"}
             </div>
             <button className="modal-close-btn" onClick={onClose} id="modal-close-btn">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -322,7 +353,9 @@ const CreateIssueModal = ({ isOpen, onClose }) => {
                 disabled={loading || !formData.title.trim()}
                 id="modal-submit-btn"
               >
-                {loading ? "Đang tạo..." : "Tạo Issue"}
+                {loading
+                  ? (isEditMode ? "Đang lưu..." : "Đang tạo...")
+                  : (isEditMode ? "Lưu thay đổi" : "Tạo Issue")}
               </button>
             </div>
           </form>
