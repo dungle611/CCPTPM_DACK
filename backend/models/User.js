@@ -36,12 +36,11 @@ const userSchema = new mongoose.Schema(
 );
 
 // Băm mật khẩu trước khi lưu
-userSchema.pre("save", async function (next) {
+userSchema.pre("save", async function () {
   // Chỉ băm nếu mật khẩu đã bị thay đổi
-  if (!this.isModified("password")) return next();
+  if (!this.isModified("password")) return;
   const salt = await bcrypt.genSalt(10);
   this.password = await bcrypt.hash(this.password, salt);
-  next();
 });
 
 // Phương thức so sánh mật khẩu

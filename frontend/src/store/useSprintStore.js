@@ -7,11 +7,11 @@ const useSprintStore = create((set, get) => ({
   loading: false,
   error: null,
 
-  // Lấy danh sách Sprints
-  fetchSprints: async () => {
+  // Lấy danh sách Sprints (truyền project để lọc theo dự án)
+  fetchSprints: async (params = {}) => {
     set({ loading: true, error: null });
     try {
-      const response = await sprintService.getAll();
+      const response = await sprintService.getAll(params);
       set({ sprints: response.data, loading: false });
     } catch (error) {
       set({ error: error.message, loading: false });

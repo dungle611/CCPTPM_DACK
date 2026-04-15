@@ -7,7 +7,7 @@ const useIssueStore = create((set, get) => ({
   loading: false,
   error: null,
 
-  // Lấy tất cả Issues từ API
+  // Lấy tất cả Issues từ API (truyền project để lọc theo dự án)
   fetchIssues: async (params = {}) => {
     set({ loading: true, error: null });
     try {

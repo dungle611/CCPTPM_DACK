@@ -9,10 +9,30 @@ const api = axios.create({
   },
 });
 
+// Request Interceptor: Tự động gắn Bearer Token vào mọi request
+api.interceptors.request.use(
+  (config) => {
+    const authStorage = localStorage.getItem("auth-storage");
+    if (authStorage) {
+      try {
+        const stored = JSON.parse(authStorage);
+        const token = stored.state?.token;
+        if (token) {
+          config.headers.Authorization = `Bearer ${token}`;
+        }
+      } catch (e) {
+        console.error("Lỗi parse auth-storage:", e);
+      }
+    }
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
+
 // ==================== ISSUE API ====================
 
 export const issueService = {
-  // Lấy tất cả Issue (có thể truyền filter)
+  // Lấy tất cả Issue (có thể truyền filter, bao gồm project)
   getAll: (params = {}) => api.get("/issues", { params }),
 
   // Lấy chi tiết 1 Issue
@@ -47,8 +67,8 @@ export const userService = {
 // ==================== SPRINT API ====================
 
 export const sprintService = {
-  // Lấy tất cả Sprints
-  getAll: () => api.get("/sprints"),
+  // Lấy tất cả Sprints (có thể truyền filter project)
+  getAll: (params = {}) => api.get("/sprints", { params }),
 
   // Tạo mới Sprint
   create: (data) => api.post("/sprints", data),
@@ -58,6 +78,24 @@ export const sprintService = {
 
   // Xóa Sprint
   delete: (id) => api.delete(`/sprints/${id}`),
+};
+
+// ==================== AUTH API ====================
+
+export const authService = {
+  register: (data) => api.post("/auth/register", data),
+  login: (data) => api.post("/auth/login", data),
+  getMe: () => api.get("/auth/me"),
+};
+
+// ==================== PROJECT API ====================
+
+export const projectService = {
+  getMyProjects: () => api.get("/projects"),
+  create: (data) => api.post("/projects", data),
+  getById: (projectId) => api.get(`/projects/${projectId}`),
+  update: (projectId, data) => api.put(`/projects/${projectId}`, data),
+  delete: (projectId) => api.delete(`/projects/${projectId}`),
 };
 
 export default api;

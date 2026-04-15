@@ -4,14 +4,28 @@ import BoardPage from "./pages/BoardPage";
 import BacklogPage from "./pages/BacklogPage";
 import TimelinePage from "./pages/TimelinePage";
 import IssuesListPage from "./pages/IssuesListPage";
+import LoginPage from "./pages/LoginPage";
+import RegisterPage from "./pages/RegisterPage";
+import StartPage from "./pages/StartPage";
 import CreateIssueModal from "./components/CreateIssueModal";
 import DeleteConfirmModal from "./components/DeleteConfirmModal";
 import useIssueStore from "./store/useIssueStore";
 import useUserStore from "./store/useUserStore";
+import useAuthStore from "./store/useAuthStore";
+import useProjectStore from "./store/useProjectStore";
 import "./App.css";
 
 function App() {
+  // Auth State
+  const { user, token } = useAuthStore();
+  const isLoggedIn = !!token && !!user;
+
+  // Routing State (Simple state-based routing vì project dùng activePage pattern)
+  const [currentView, setCurrentView] = useState("start"); // "login" | "register" | "start" | "project"
   const [activePage, setActivePage] = useState("board");
+  const [selectedProjectId, setSelectedProjectId] = useState(null);
+
+  // Issue Modal State
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [editingIssue, setEditingIssue] = useState(null);
   const [deletingIssue, setDeletingIssue] = useState(null);
@@ -19,12 +33,28 @@ function App() {
   const fetchIssues = useIssueStore((state) => state.fetchIssues);
   const fetchUsers = useUserStore((state) => state.fetchUsers);
   const removeIssue = useIssueStore((state) => state.removeIssue);
+  const { setCurrentProject, currentProject } = useProjectStore();
 
-  // Lấy dữ liệu ban đầu khi app load
+  // Khi login/logout thay đổi, chuyển hướng
   useEffect(() => {
-    fetchIssues();
-    fetchUsers();
-  }, [fetchIssues, fetchUsers]);
+    if (!isLoggedIn) {
+      setCurrentView("login");
+      setSelectedProjectId(null);
+    } else if (currentView === "login" || currentView === "register") {
+      setCurrentView("start");
+    }
+  }, [isLoggedIn]);
+
+  // Khi chọn project, fetch dữ liệu
+  useEffect(() => {
+    if (selectedProjectId && isLoggedIn) {
+      setCurrentProject(selectedProjectId);
+      fetchIssues({ project: selectedProjectId });
+      fetchUsers();
+      setCurrentView("project");
+      setActivePage("board");
+    }
+  }, [selectedProjectId]);
 
   // Auto-hide toast
   useEffect(() => {
@@ -34,24 +64,21 @@ function App() {
     }
   }, [toast]);
 
-  // Mở modal tạo mới
+  // Handlers cho Issue Modal
   const handleCreate = () => {
     setEditingIssue(null);
     setIsCreateModalOpen(true);
   };
 
-  // Mở modal chỉnh sửa
   const handleEdit = (issue) => {
     setEditingIssue(issue);
     setIsCreateModalOpen(true);
   };
 
-  // Mở modal xác nhận xóa
   const handleDeleteRequest = (issue) => {
     setDeletingIssue(issue);
   };
 
-  // Xử lý xóa Issue
   const handleDeleteConfirm = async (id) => {
     try {
       await removeIssue(id);
@@ -65,13 +92,36 @@ function App() {
     }
   };
 
-  // Đóng modal tạo/sửa
   const handleCloseCreateModal = () => {
     setIsCreateModalOpen(false);
     setEditingIssue(null);
   };
 
-  // Render trang hiện tại
+  const handleBackToProjects = () => {
+    setSelectedProjectId(null);
+    setCurrentView("start");
+  };
+
+  // ===== AUTH VIEWS =====
+  if (!isLoggedIn) {
+    if (currentView === "register") {
+      return <RegisterPage onSwitchToLogin={() => setCurrentView("login")} />;
+    }
+    return <LoginPage onSwitchToRegister={() => setCurrentView("register")} />;
+  }
+
+  // ===== START PAGE (Danh sách dự án) =====
+  if (currentView === "start" || currentView === "login" || currentView === "register") {
+    return (
+      <StartPage
+        onSelectProject={(projectId) => {
+          setSelectedProjectId(projectId);
+        }}
+      />
+    );
+  }
+
+  // ===== PROJECT VIEW (Board/Backlog/Timeline/Issues) =====
   const renderPage = () => {
     switch (activePage) {
       case "issues":
@@ -120,12 +170,15 @@ function App() {
         onCreateIssue={handleCreate}
         activePage={activePage}
         onNavigate={setActivePage}
+        projectName={currentProject?.name}
+        projectKey={currentProject?.key}
+        onBackToProjects={handleBackToProjects}
       />
       <main className="main-content">
         {renderPage()}
       </main>
 
-      {/* Toast thông báo (cho delete) */}
+      {/* Toast thông báo */}
       {toast && (
         <div className="toast-container">
           <div className={`toast ${toast.type}`}>

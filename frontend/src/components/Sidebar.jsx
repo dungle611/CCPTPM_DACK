@@ -1,18 +1,31 @@
 // Sidebar.jsx - Thanh điều hướng bên trái kiểu Jira
-const Sidebar = ({ onCreateIssue, activePage, onNavigate }) => {
+import useAuthStore from "../store/useAuthStore";
+
+const Sidebar = ({ onCreateIssue, activePage, onNavigate, projectName, projectKey, onBackToProjects }) => {
+  const { user, logout } = useAuthStore();
+
   return (
     <aside className="sidebar">
-      {/* Logo */}
+      {/* Logo + Nút quay lại */}
       <div className="sidebar-header">
         <div className="sidebar-logo">
           <div className="sidebar-logo-icon">T</div>
           <span className="sidebar-logo-text">TaskFlow</span>
         </div>
         <div className="sidebar-project">
-          <div className="sidebar-project-name">Dự án CCPTPM</div>
+          <div className="sidebar-project-name">{projectName || "Dự án"}</div>
           <div className="sidebar-project-type">Software Project</div>
         </div>
       </div>
+
+      {/* Nút quay lại danh sách dự án */}
+      <button className="sidebar-back-btn" onClick={onBackToProjects} id="sidebar-back-btn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <line x1="19" y1="12" x2="5" y2="12" />
+          <polyline points="12 19 5 12 12 5" />
+        </svg>
+        Danh sách dự án
+      </button>
 
       {/* Navigation */}
       <nav className="sidebar-nav">
@@ -104,6 +117,23 @@ const Sidebar = ({ onCreateIssue, activePage, onNavigate }) => {
         </svg>
         Tạo Issue mới
       </button>
+
+      {/* User Info + Logout */}
+      <div className="sidebar-user-section">
+        <div className="sidebar-user-info">
+          <div className="sidebar-user-avatar">
+            {user?.name?.charAt(0)?.toUpperCase()}
+          </div>
+          <span className="sidebar-user-name">{user?.name}</span>
+        </div>
+        <button className="sidebar-logout-btn" onClick={logout} title="Đăng xuất">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+            <polyline points="16 17 21 12 16 7" />
+            <line x1="21" y1="12" x2="9" y2="12" />
+          </svg>
+        </button>
+      </div>
     </aside>
   );
 };
