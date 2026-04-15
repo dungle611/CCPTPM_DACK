@@ -48,7 +48,43 @@ const useProjectStore = create((set) => ({
     }
   },
 
+  // ========== QUẢN LÝ THÀNH VIÊN ==========
+
+  // Thêm thành viên bằng email
+  addMember: async (projectId, email, role = "Member") => {
+    try {
+      const res = await projectService.addMember(projectId, { email, role });
+      set({ currentProject: res.data });
+      return res.data;
+    } catch (error) {
+      throw error;
+    }
+  },
+
+  // Cập nhật vai trò thành viên
+  updateMemberRole: async (projectId, memberId, role) => {
+    try {
+      const res = await projectService.updateMemberRole(projectId, memberId, { role });
+      set({ currentProject: res.data });
+      return res.data;
+    } catch (error) {
+      throw error;
+    }
+  },
+
+  // Xóa thành viên khỏi dự án
+  removeMember: async (projectId, memberId) => {
+    try {
+      const res = await projectService.removeMember(projectId, memberId);
+      set({ currentProject: res.data });
+      return res.data;
+    } catch (error) {
+      throw error;
+    }
+  },
+
   clearCurrentProject: () => set({ currentProject: null }),
 }));
 
 export default useProjectStore;
+
