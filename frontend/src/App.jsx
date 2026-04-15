@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import Sidebar from "./components/Sidebar";
 import BoardPage from "./pages/BoardPage";
 import BacklogPage from "./pages/BacklogPage";
+import TimelinePage from "./pages/TimelinePage";
 import IssuesListPage from "./pages/IssuesListPage";
 import CreateIssueModal from "./components/CreateIssueModal";
 import DeleteConfirmModal from "./components/DeleteConfirmModal";
@@ -85,6 +86,15 @@ function App() {
       case "backlog":
         return (
           <BacklogPage
+            onCreateIssue={handleCreate}
+            onEditIssue={handleEdit}
+            onDeleteIssue={handleDeleteRequest}
+            onShowToast={setToast}
+          />
+        );
+      case "timeline":
+        return (
+          <TimelinePage
             onCreateIssue={handleCreate}
             onEditIssue={handleEdit}
             onDeleteIssue={handleDeleteRequest}

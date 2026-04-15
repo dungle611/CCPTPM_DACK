@@ -42,6 +42,14 @@ const issueSchema = new mongoose.Schema(
       ref: "Sprint",
       default: null, // Thuộc về Sprint nào, null = nằm trơ trọi ở Backlog
     },
+    startDate: {
+      type: Date,
+      default: null, // Ngày bắt đầu (dùng cho Timeline)
+    },
+    dueDate: {
+      type: Date,
+      default: null, // Ngày kết thúc (dùng cho Timeline)
+    },
     order: {
       type: Number,
       default: 0, // Thứ tự hiển thị trên cột Board (phục vụ kéo thả)
