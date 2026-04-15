@@ -42,6 +42,11 @@ const issueSchema = new mongoose.Schema(
       ref: "Sprint",
       default: null, // Thuộc về Sprint nào, null = nằm trơ trọi ở Backlog
     },
+    project: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Project",
+      required: [true, "Issue phải thuộc về một Project cụ thể"],
+    },
     startDate: {
       type: Date,
       default: null, // Ngày bắt đầu (dùng cho Timeline)

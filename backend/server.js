@@ -19,11 +19,15 @@ mongoose
 const issueRoutes = require("./routes/issueRoutes");
 const userRoutes = require("./routes/userRoutes");
 const sprintRoutes = require("./routes/sprintRoutes");
+const authRoutes = require("./routes/authRoutes");
+const projectRoutes = require("./routes/projectRoutes");
 
 // Sử dụng Routes
 app.use("/api/issues", issueRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/sprints", sprintRoutes);
+app.use("/api/auth", authRoutes);
+app.use("/api/projects", projectRoutes);
 
 // Route kiểm tra server
 app.get("/", (req, res) => {

@@ -8,6 +8,11 @@ const {
   deleteIssue,
 } = require("../controllers/issueController");
 
+const { protect } = require("../middleware/authMiddleware");
+
+// Bảo vệ tất cả API issue
+router.use(protect);
+
 router.get("/", getIssues);
 router.get("/:id", getIssueById);
 router.post("/", createIssue);

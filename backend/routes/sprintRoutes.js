@@ -2,6 +2,11 @@ const express = require("express");
 const router = express.Router();
 const sprintController = require("../controllers/sprintController");
 
+const { protect } = require("../middleware/authMiddleware");
+
+// Bảo vệ tất cả API sprint
+router.use(protect);
+
 // Lấy danh sách Sprints
 router.get("/", sprintController.getSprints);
 

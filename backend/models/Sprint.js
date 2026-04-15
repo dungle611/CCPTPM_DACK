@@ -24,6 +24,11 @@ const sprintSchema = new mongoose.Schema(
       enum: ["Future", "Active", "Closed"],
       default: "Future",
     },
+    project: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Project",
+      required: [true, "Sprint phải thuộc về một Project cụ thể"],
+    },
   },
   {
     timestamps: true,

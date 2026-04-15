@@ -4,6 +4,7 @@ const Issue = require("../models/Issue");
 const getIssues = async (req, res) => {
   try {
     const filter = {};
+    if (req.query.project) filter.project = req.query.project; // Bắt buộc lọc theo project
     if (req.query.type) filter.type = req.query.type;
     if (req.query.status) filter.status = req.query.status;
     if (req.query.assignee) filter.assignee = req.query.assignee;

@@ -1,10 +1,14 @@
 const Sprint = require("../models/Sprint");
 const Issue = require("../models/Issue");
 
-// Lấy danh sách toàn bộ Sprint
+// Lấy danh sách toàn bộ Sprint theo Project
 exports.getSprints = async (req, res) => {
   try {
-    const sprints = await Sprint.find().sort({ createdAt: 1 });
+    const filter = {};
+    if (req.query.project) {
+        filter.project = req.query.project;
+    }
+    const sprints = await Sprint.find(filter).sort({ createdAt: 1 });
     res.status(200).json(sprints);
   } catch (error) {
     res.status(500).json({ message: "Lỗi khi lấy danh sách Sprint", error: error.message });
