@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 import useIssueStore from "../store/useIssueStore";
 import useSprintStore from "../store/useSprintStore";
+import { getAvatarInitials } from "../utils/helpers";
 
 // Component hiển thị Issue theo dạng dòng (Row) trong Backlog
 const BacklogIssueRow = ({ issue, index, onEdit, onDelete }) => {
@@ -52,7 +53,7 @@ const BacklogIssueRow = ({ issue, index, onEdit, onDelete }) => {
             </div>
             {issue.assignee && (
               <div className="backlog-issue-avatar" title={issue.assignee.name}>
-                {issue.assignee.name.charAt(0).toUpperCase()}
+                {getAvatarInitials(issue.assignee.name)}
               </div>
             )}
             <span className={`backlog-issue-status tag-${issue.status.toLowerCase()}`}>

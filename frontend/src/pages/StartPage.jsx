@@ -2,11 +2,13 @@ import { useEffect, useState } from "react";
 import useAuthStore from "../store/useAuthStore";
 import useProjectStore from "../store/useProjectStore";
 import CreateProjectModal from "../components/CreateProjectModal";
+import { getAvatarInitials } from "../utils/helpers";
 
 const StartPage = ({ onSelectProject }) => {
   const { user, logout } = useAuthStore();
   const { projects, fetchProjects, isLoading } = useProjectStore();
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [isProjectsExpanded, setIsProjectsExpanded] = useState(false);
 
   useEffect(() => {
     fetchProjects();
@@ -18,6 +20,68 @@ const StartPage = ({ onSelectProject }) => {
     if (hour < 18) return "Chào buổi chiều";
     return "Chào buổi tối";
   };
+
+  const renderProjectCard = (project) => (
+    <div
+      key={project._id}
+      className="start-project-card"
+      onClick={() => onSelectProject(project._id)}
+      id={`project-card-${project._id}`}
+    >
+      <div className="start-project-card-avatar">
+        {project.avatar ? (
+          <img src={project.avatar} alt={project.key} />
+        ) : (
+          <span>{project.key?.substring(0, 2)}</span>
+        )}
+      </div>
+      <div className="start-project-card-info">
+        <h3 className="start-project-card-name" style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+          {project.name}
+          <span className="start-project-card-key">{project.key}</span>
+        </h3>
+        <div className="start-project-card-meta" style={{ marginTop: "6px", overflow: "visible" }}>
+          {/* Hiển thị members team */}
+          <div className="project-members-list" style={{ display: "flex", alignItems: "center" }}>
+            <svg viewBox="0 0 24 24" fill="none" stroke="#00875a" strokeWidth="2.5" style={{ width: 14, height: 14, marginRight: 8 }}>
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+              <circle cx="12" cy="7" r="4" />
+            </svg>
+            {project.members &&
+              project.members.slice(0, 5).map((member, idx) => (
+                <div
+                  key={idx}
+                  title={member.user?.name || "Thành viên"}
+                  style={{
+                    width: "24px",
+                    height: "24px",
+                    borderRadius: "50%",
+                    background: `hsl(${(idx * 50 + 200) % 360}, 70%, 45%)`,
+                    color: "white",
+                    fontSize: "11px",
+                    fontWeight: "bold",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    marginLeft: idx > 0 ? "-6px" : "0",
+                    border: "2px solid #fff",
+                    zIndex: 10 - idx,
+                  }}
+                >
+                  {getAvatarInitials(member.user?.name)}
+                </div>
+              ))}
+            {project.members && project.members.length > 5 && (
+              <div style={{ marginLeft: "6px", fontSize: "12px", color: "#6b778c", fontWeight: 600 }}>
+                +{project.members.length - 5}
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+      <button className="start-project-card-go">Mở dự án</button>
+    </div>
+  );
 
   return (
     <div className="start-page">
@@ -36,11 +100,7 @@ const StartPage = ({ onSelectProject }) => {
         <div className="start-topbar-right">
           <div className="start-user-info">
             <div className="start-user-avatar">
-              {user?.avatar ? (
-                <img src={user.avatar} alt={user.name} />
-              ) : (
-                <span>{user?.name?.charAt(0)?.toUpperCase()}</span>
-              )}
+              <span>{getAvatarInitials(user?.name)}</span>
             </div>
             <span className="start-user-name">{user?.name}</span>
           </div>
@@ -111,32 +171,62 @@ const StartPage = ({ onSelectProject }) => {
             </div>
           ) : (
             <div className="start-projects-grid">
-              {projects.map((project) => (
-                <div
-                  key={project._id}
-                  className="start-project-card"
-                  onClick={() => onSelectProject(project._id)}
-                  id={`project-card-${project._id}`}
-                >
-                  <div className="start-project-card-avatar">
-                    {project.avatar ? (
-                      <img src={project.avatar} alt={project.key} />
-                    ) : (
-                      <span>{project.key?.substring(0, 2)}</span>
-                    )}
-                  </div>
-                  <div className="start-project-card-info">
-                    <h3 className="start-project-card-name">{project.name}</h3>
-                    <div className="start-project-card-meta">
-                      <span className="start-project-card-key">{project.key}</span>
-                      <span className="start-project-card-type">Software Project</span>
-                    </div>
-                  </div>
-                  <button className="start-project-card-go">
-                    Mở →
+              {/* Dự án gần nhất */}
+              {projects.length > 0 && renderProjectCard(projects[0])}
+
+              {/* Các dự án còn lại (Toggle Collapse/Expand) */}
+              {projects.length > 1 && (
+                <>
+                  <button
+                    onClick={() => setIsProjectsExpanded(!isProjectsExpanded)}
+                    style={{
+                      background: "transparent",
+                      border: "none",
+                      cursor: "pointer",
+                      color: "#6b778c",
+                      fontWeight: 600,
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "8px",
+                      margin: "8px 0 4px 0",
+                      padding: "8px 12px",
+                      borderRadius: "6px",
+                      fontSize: "14px",
+                      transition: "background 0.2s"
+                    }}
+                    onMouseEnter={(e) => e.currentTarget.style.background = "#ebecf0"}
+                    onMouseLeave={(e) => e.currentTarget.style.background = "transparent"}
+                  >
+                    <svg
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      style={{
+                        width: 16,
+                        height: 16,
+                        transform: isProjectsExpanded ? "rotate(90deg)" : "rotate(0deg)",
+                        transition: "transform 0.15s ease",
+                      }}
+                    >
+                      <polyline points="9 18 15 12 9 6" />
+                    </svg>
+                    {isProjectsExpanded ? "Thu gọn danh sách" : `Xem thêm ${projects.length - 1} dự án khác`}
                   </button>
-                </div>
-              ))}
+
+                  <div style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: "8px",
+                    overflow: "hidden",
+                    transition: "max-height 0.3s ease, opacity 0.3s ease",
+                    maxHeight: isProjectsExpanded ? "1000px" : "0",
+                    opacity: isProjectsExpanded ? 1 : 0
+                  }}>
+                    {projects.slice(1).map(renderProjectCard)}
+                  </div>
+                </>
+              )}
             </div>
           )}
         </div>

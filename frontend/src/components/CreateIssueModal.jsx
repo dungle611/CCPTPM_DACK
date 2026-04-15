@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import useIssueStore from "../store/useIssueStore";
 import useUserStore from "../store/useUserStore";
+import useProjectStore from "../store/useProjectStore";
 
 // Modal dùng chung cho cả Tạo mới và Chỉnh sửa Issue
 const CreateIssueModal = ({ isOpen, onClose, editIssue = null }) => {
@@ -126,6 +127,14 @@ const CreateIssueModal = ({ isOpen, onClose, editIssue = null }) => {
         await updateIssue(editIssue._id, submitData);
         setToast({ type: "success", message: "Cập nhật Issue thành công! ✏️" });
       } else {
+        // Gắn Project ID hiện tại
+        const currentProject = useProjectStore.getState().currentProject;
+        if (currentProject) {
+          submitData.project = currentProject._id;
+        } else {
+          throw new Error("Không xác định được dự án hiện tại!");
+        }
+
         await addIssue(submitData);
         setToast({ type: "success", message: "Tạo Issue thành công! 🎉" });
       }
@@ -137,7 +146,7 @@ const CreateIssueModal = ({ isOpen, onClose, editIssue = null }) => {
     } catch (error) {
       setToast({
         type: "error",
-        message: error?.response?.data?.message || `Có lỗi xảy ra khi ${isEditMode ? "cập nhật" : "tạo"} Issue!`,
+        message: error.message || error?.response?.data?.message || `Có lỗi xảy ra khi ${isEditMode ? "cập nhật" : "tạo"} Issue!`,
       });
     } finally {
       setLoading(false);

@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { sprintService } from "../services/api";
+import useProjectStore from "./useProjectStore";
 
 const useSprintStore = create((set, get) => ({
   // State
@@ -21,6 +22,16 @@ const useSprintStore = create((set, get) => ({
   // Tạo Sprint Mới
   addSprint: async (data = {}) => {
     try {
+      // Tự động đính kèm project ID nếu chưa có
+      if (!data.project) {
+        const currentProject = useProjectStore.getState().currentProject;
+        if (currentProject) {
+          data.project = currentProject._id;
+        } else {
+          throw new Error("Không thể tạo dữ liệu: Chưa chọn dự án!");
+        }
+      }
+      
       const response = await sprintService.create(data);
       set((state) => ({ sprints: [...state.sprints, response.data] }));
       return response.data;

@@ -1,6 +1,10 @@
 import { useState } from "react";
 import useIssueStore from "../store/useIssueStore";
 import IssueDetailModal from "../components/IssueDetailModal";
+import useProjectStore from "../store/useProjectStore";
+import useUserStore from "../store/useUserStore";
+import useSprintStore from "../store/useSprintStore";
+import { getAvatarInitials } from "../utils/helpers";
 
 const IssuesListPage = ({ onCreateIssue, onEditIssue, onDeleteIssue }) => {
   const issues = useIssueStore((state) => state.issues);
@@ -245,8 +249,8 @@ const IssuesListPage = ({ onCreateIssue, onEditIssue, onDeleteIssue }) => {
                   <td>
                     {issue.assignee ? (
                       <span className="table-assignee">
-                        <span className="table-avatar">
-                          {issue.assignee.name?.charAt(0).toUpperCase()}
+                        <span className="table-avatar" title={issue.assignee.name}>
+                          {getAvatarInitials(issue.assignee.name)}
                         </span>
                         {issue.assignee.name}
                       </span>

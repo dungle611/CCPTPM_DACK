@@ -10,6 +10,7 @@ const getMyProjects = async (req, res) => {
       ],
     })
       .populate("owner", "name email avatar")
+      .populate("members.user", "name email avatar")
       .sort({ createdAt: -1 });
 
     res.json(projects);

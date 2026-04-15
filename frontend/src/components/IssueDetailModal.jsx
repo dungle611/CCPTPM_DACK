@@ -1,5 +1,9 @@
 import { useState } from "react";
 import useIssueStore from "../store/useIssueStore";
+import useProjectStore from "../store/useProjectStore";
+import useUserStore from "../store/useUserStore";
+import useSprintStore from "../store/useSprintStore";
+import { getAvatarInitials } from "../utils/helpers";
 
 const IssueDetailModal = ({ issue, isOpen, onClose }) => {
   if (!isOpen || !issue) return null;
@@ -89,8 +93,8 @@ const IssueDetailModal = ({ issue, isOpen, onClose }) => {
               <span className="detail-info-value">
                 {issue.assignee ? (
                   <span className="detail-assignee">
-                    <span className="detail-avatar-small">
-                      {issue.assignee.name?.charAt(0).toUpperCase()}
+                    <span className="detail-avatar-small" title={issue.assignee?.name}>
+                      {getAvatarInitials(issue.assignee.name)}
                     </span>
                     {issue.assignee.name}
                   </span>

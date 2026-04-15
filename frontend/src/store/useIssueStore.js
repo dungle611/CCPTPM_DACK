@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { issueService } from "../services/api";
+import useProjectStore from "./useProjectStore";
 
 const useIssueStore = create((set, get) => ({
   // State
@@ -21,6 +22,16 @@ const useIssueStore = create((set, get) => ({
   // Tạo Issue mới
   addIssue: async (data) => {
     try {
+      // Tự động đính kèm project ID nếu chưa có
+      if (!data.project) {
+        const currentProject = useProjectStore.getState().currentProject;
+        if (currentProject) {
+          data.project = currentProject._id;
+        } else {
+          throw new Error("Không thể tạo dữ liệu: Chưa chọn dự án!");
+        }
+      }
+      
       const response = await issueService.create(data);
       set((state) => ({ issues: [...state.issues, response.data] }));
       return response.data;

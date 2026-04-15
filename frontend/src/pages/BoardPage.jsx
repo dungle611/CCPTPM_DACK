@@ -3,6 +3,7 @@ import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 import useIssueStore from "../store/useIssueStore";
 import useSprintStore from "../store/useSprintStore";
 import useUserStore from "../store/useUserStore";
+import { getAvatarInitials } from "../utils/helpers";
 
 const COLUMNS = [
   { key: "Todo", label: "Cần làm", indicator: "todo" },
@@ -43,13 +44,6 @@ const IssueCard = ({ issue, onEdit, onDelete, index }) => {
         <polyline points="6 9 12 15 18 9" />
       </svg>
     );
-  };
-
-  const getAvatarInitial = () => {
-    if (issue.assignee && issue.assignee.name) {
-      return issue.assignee.name.charAt(0).toUpperCase();
-    }
-    return "?";
   };
 
   return (
@@ -101,7 +95,7 @@ const IssueCard = ({ issue, onEdit, onDelete, index }) => {
             </div>
             {issue.assignee && (
               <div className="issue-card-avatar" title={issue.assignee.name}>
-                {getAvatarInitial()}
+                {getAvatarInitials(issue.assignee.name)}
               </div>
             )}
           </div>
@@ -360,7 +354,7 @@ const BoardPage = ({ onCreateIssue, onEditIssue, onDeleteIssue, onShowToast }) =
                   title={assignee.name}
                 >
                   <span className="board-avatar-filter-initial">
-                    {assignee.name.charAt(0).toUpperCase()}
+                    {getAvatarInitials(assignee.name)}
                   </span>
                 </button>
               ))}
