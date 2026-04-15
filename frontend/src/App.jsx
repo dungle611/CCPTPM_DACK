@@ -4,6 +4,7 @@ import BoardPage from "./pages/BoardPage";
 import BacklogPage from "./pages/BacklogPage";
 import TimelinePage from "./pages/TimelinePage";
 import IssuesListPage from "./pages/IssuesListPage";
+import MembersPage from "./pages/MembersPage";
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
 import StartPage from "./pages/StartPage";
@@ -20,10 +21,27 @@ function App() {
   const { user, token } = useAuthStore();
   const isLoggedIn = !!token && !!user;
 
-  // Routing State (Simple state-based routing vì project dùng activePage pattern)
-  const [currentView, setCurrentView] = useState("start"); // "login" | "register" | "start" | "project"
-  const [activePage, setActivePage] = useState("board");
-  const [selectedProjectId, setSelectedProjectId] = useState(null);
+  // Routing State (Lưu vào localStorage để không bị mất khi F5)
+  const [currentView, setCurrentView] = useState(() => localStorage.getItem("app_currentView") || "start");
+  const [activePage, setActivePage] = useState(() => localStorage.getItem("app_activePage") || "board");
+  const [selectedProjectId, setSelectedProjectId] = useState(() => localStorage.getItem("app_selectedProjectId") || null);
+
+  // Sync state to localStorage whenever they change
+  useEffect(() => {
+    localStorage.setItem("app_currentView", currentView);
+  }, [currentView]);
+
+  useEffect(() => {
+    localStorage.setItem("app_activePage", activePage);
+  }, [activePage]);
+
+  useEffect(() => {
+    if (selectedProjectId) {
+      localStorage.setItem("app_selectedProjectId", selectedProjectId);
+    } else {
+      localStorage.removeItem("app_selectedProjectId");
+    }
+  }, [selectedProjectId]);
 
   // Issue Modal State
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
@@ -52,7 +70,6 @@ function App() {
       fetchIssues({ project: selectedProjectId });
       fetchUsers();
       setCurrentView("project");
-      setActivePage("board");
     }
   }, [selectedProjectId]);
 
@@ -116,6 +133,7 @@ function App() {
       <StartPage
         onSelectProject={(projectId) => {
           setSelectedProjectId(projectId);
+          setActivePage("board");
         }}
       />
     );
@@ -151,6 +169,8 @@ function App() {
             onShowToast={setToast}
           />
         );
+      case "members":
+        return <MembersPage onShowToast={setToast} />;
       case "board":
       default:
         return (

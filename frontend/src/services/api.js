@@ -96,6 +96,11 @@ export const projectService = {
   getById: (projectId) => api.get(`/projects/${projectId}`),
   update: (projectId, data) => api.put(`/projects/${projectId}`, data),
   delete: (projectId) => api.delete(`/projects/${projectId}`),
+
+  // ===== Member Management =====
+  addMember: (projectId, data) => api.post(`/projects/${projectId}/members`, data),
+  updateMemberRole: (projectId, memberId, data) => api.put(`/projects/${projectId}/members/${memberId}`, data),
+  removeMember: (projectId, memberId) => api.delete(`/projects/${projectId}/members/${memberId}`),
 };
 
 export default api;

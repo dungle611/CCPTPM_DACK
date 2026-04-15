@@ -6,6 +6,9 @@ const {
   getProjectById,
   updateProject,
   deleteProject,
+  addMember,
+  updateMemberRole,
+  removeMember,
 } = require("../controllers/projectController");
 const { protect, checkProjectRole } = require("../middleware/authMiddleware");
 
@@ -25,4 +28,13 @@ router.route("/:projectId")
   // Xóa project: Chỉ Owner mới được xóa
   .delete(checkProjectRole("Owner"), deleteProject);
 
+// ========== QUẢN LÝ THÀNH VIÊN ==========
+// Thêm thành viên: Owner, Admin
+router.post("/:projectId/members", checkProjectRole("Owner", "Admin"), addMember);
+// Cập nhật vai trò: Owner, Admin
+router.put("/:projectId/members/:memberId", checkProjectRole("Owner", "Admin"), updateMemberRole);
+// Xóa thành viên: Owner, Admin
+router.delete("/:projectId/members/:memberId", checkProjectRole("Owner", "Admin"), removeMember);
+
 module.exports = router;
+
