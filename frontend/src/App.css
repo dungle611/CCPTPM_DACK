@@ -3307,3 +3307,27 @@
   margin-top: 4px;
   line-height: 1.4;
 }
+
+/* ========================================
+   COMPACT REGISTER CONTAINER
+   ======================================== */
+.register-container {
+  padding: 24px 32px !important;
+}
+
+.register-container .auth-title {
+  margin-bottom: 4px !important;
+}
+
+.register-container .auth-subtitle {
+  margin-bottom: 16px !important;
+}
+
+.register-container .auth-form {
+  gap: 12px !important;
+}
+
+.register-container .auth-field {
+  margin-bottom: 0 !important;
+}
+

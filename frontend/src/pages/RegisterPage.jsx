@@ -30,7 +30,7 @@ const RegisterPage = ({ onSwitchToLogin }) => {
 
   return (
     <div className="auth-page">
-      <div className="auth-container">
+      <div className="auth-container register-container">
         {/* Logo */}
         <div className="auth-logo">
           <div className="auth-logo-icon">

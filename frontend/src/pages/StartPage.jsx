@@ -104,7 +104,11 @@ const StartPage = ({ onSelectProject }) => {
             </div>
             <span className="start-user-name">{user?.name}</span>
           </div>
-          <button className="start-logout-btn" onClick={logout} id="logout-btn">
+          <button className="start-logout-btn" onClick={() => {
+            if (window.confirm("Bạn có chắc chắn muốn đăng xuất khỏi ứng dụng không?")) {
+              logout();
+            }
+          }} id="logout-btn">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
               <polyline points="16 17 21 12 16 7" />
