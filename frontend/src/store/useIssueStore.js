@@ -45,10 +45,18 @@ const useIssueStore = create((set, get) => ({
   updateIssue: async (id, data) => {
     try {
       const response = await issueService.update(id, data);
+      const isEpicDone = response.data.type === "Epic" && response.data.status === "Done";
+      
       set((state) => ({
-        issues: state.issues.map((issue) =>
-          issue._id === id ? response.data : issue
-        ),
+        issues: state.issues.map((issue) => {
+          // Update the targeted issue
+          if (issue._id === id) return response.data;
+          // Cascade 'Done' to children immediately in UI if parent Epic is marked Done
+          if (isEpicDone && (issue.parentId === id || issue.parentId?._id === id)) {
+            return { ...issue, status: "Done" };
+          }
+          return issue;
+        }),
       }));
       return response.data;
     } catch (error) {
@@ -93,12 +101,18 @@ const useIssueStore = create((set, get) => ({
   // Cập nhật UI ngay lập tức, gọi API ngầm, rollback nếu lỗi
   moveIssue: async (id, newStatus) => {
     const previousIssues = get().issues;
+    const movedObj = previousIssues.find(i => i._id === id);
+    const isEpicCascade = movedObj?.type === "Epic" && newStatus === "Done";
 
     // Bước 1: Cập nhật UI ngay (optimistic)
     set((state) => ({
-      issues: state.issues.map((issue) =>
-        issue._id === id ? { ...issue, status: newStatus } : issue
-      ),
+      issues: state.issues.map((issue) => {
+        if (issue._id === id) return { ...issue, status: newStatus };
+        if (isEpicCascade && (issue.parentId === id || issue.parentId?._id === id)) {
+          return { ...issue, status: "Done" };
+        }
+        return issue;
+      }),
     }));
 
     // Bước 2: Gọi API cập nhật database

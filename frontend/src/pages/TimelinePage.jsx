@@ -43,6 +43,12 @@ const TimelinePage = ({ onCreateIssue, onEditIssue, onDeleteIssue, onShowToast }
   const [inlineTitle, setInlineTitle] = useState("");
   const inlineInputRef = useRef(null);
 
+  // Child inline create state
+  const [creatingChildFor, setCreatingChildFor] = useState(null); // epicId
+  const [childInlineTitle, setChildInlineTitle] = useState("");
+  const [childInlineType, setChildInlineType] = useState("Task"); // Task | Story
+  const childInlineInputRef = useRef(null);
+
   // Ghost bar state (hover trên gantt row)
   const [ghostBar, setGhostBar] = useState(null); // { issueId, left }
   const updateIssue = useIssueStore((state) => state.updateIssue);
@@ -203,6 +209,51 @@ const TimelinePage = ({ onCreateIssue, onEditIssue, onDeleteIssue, onShowToast }
     }
   };
 
+  // Inline create Child
+  const handleStartChildCreate = (epicId) => {
+    // Tự động mở rộng epic nếu chưa mở
+    setExpandedEpics((prev) => {
+      const next = new Set(prev);
+      next.add(epicId);
+      return next;
+    });
+    setCreatingChildFor(epicId);
+    setChildInlineTitle("");
+    setChildInlineType("Task");
+    setTimeout(() => childInlineInputRef.current?.focus(), 50);
+  };
+
+  const handleChildInlineSubmit = async () => {
+    if (!childInlineTitle.trim() || !creatingChildFor) {
+      setCreatingChildFor(null);
+      return;
+    }
+    const epicId = creatingChildFor;
+    try {
+      await addIssue({
+        title: childInlineTitle.trim(),
+        type: childInlineType,
+        parentId: epicId,
+      });
+      setChildInlineTitle("");
+      if (onShowToast) onShowToast({ type: "success", message: `Tạo ${childInlineType} thành công! ✅` });
+      // Vẫn giữ lại state creatingChildFor để tạo tiếp nếu user muốn, hoặc chuyển về null tuỳ Jira
+      // Ở đây clear form và tiếp tục focus lại để gõ tiếp task 2
+      setTimeout(() => childInlineInputRef.current?.focus(), 50);
+    } catch (err) {
+      if (onShowToast) onShowToast({ type: "error", message: "Lỗi khi tạo Task con!" });
+    }
+  };
+
+  const handleChildInlineKeyDown = (e) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      handleChildInlineSubmit();
+    } else if (e.key === "Escape") {
+      setCreatingChildFor(null);
+    }
+  };
+
 
   const totalDays = daysBetween(timelineRange.start, timelineRange.end);
 
@@ -258,10 +309,15 @@ const TimelinePage = ({ onCreateIssue, onEditIssue, onDeleteIssue, onShowToast }
         children.forEach((child) => {
           result.push({ type: "child", issue: child, depth: 1 });
         });
+        
+        // Thêm dòng input inline nếu user đang tạo task con cho epic này
+        if (creatingChildFor === epic._id) {
+          result.push({ type: "inline-child-form", epicId: epic._id, depth: 1, _id: `inline-${epic._id}` });
+        }
       }
     });
     return result;
-  }, [epics, expandedEpics, issues]);
+  }, [epics, expandedEpics, issues, creatingChildFor]);
 
   return (
     <div className="timeline-page">
@@ -299,6 +355,43 @@ const TimelinePage = ({ onCreateIssue, onEditIssue, onDeleteIssue, onShowToast }
           {/* Issue Rows */}
           {rows.map((row) => {
             const { issue, depth } = row;
+            
+            // Xử lý render form nhập inline cho child
+            if (row.type === "inline-child-form") {
+              return (
+                <div key={row._id} className="timeline-work-row child-row" style={{ paddingLeft: `${16 + depth * 28}px` }}>
+                  <span className="tl-toggle-spacer" />
+                  <div className="tl-inline-child-create">
+                    <select 
+                      className="tl-inline-type-select" 
+                      value={childInlineType} 
+                      onChange={(e) => setChildInlineType(e.target.value)}
+                    >
+                      <option value="Task">☑️ Task</option>
+                      <option value="Story">📖 Story</option>
+                    </select>
+                    <input
+                      ref={childInlineInputRef}
+                      type="text"
+                      className="tl-inline-input"
+                      placeholder="What needs to be done?"
+                      value={childInlineTitle}
+                      onChange={(e) => setChildInlineTitle(e.target.value)}
+                      onKeyDown={handleChildInlineKeyDown}
+                      onBlur={() => {
+                        // Delay mờ form để click nút submit không bị chặn
+                        setTimeout(() => {
+                          if (!document.activeElement.closest('.tl-inline-child-create')) {
+                            setCreatingChildFor(null);
+                          }
+                        }, 200);
+                      }}
+                    />
+                  </div>
+                </div>
+              );
+            }
+
             const isEpic = row.type === "epic";
             const isExpanded = expandedEpics.has(issue._id);
             const childCount = isEpic ? getChildren(issue._id).length : 0;
@@ -331,22 +424,45 @@ const TimelinePage = ({ onCreateIssue, onEditIssue, onDeleteIssue, onShowToast }
                   {getTypeIcon(issue.type)}
                 </span>
 
-                {/* Title */}
-                <span className="tl-issue-title" title={issue.title}>
-                  {issue.title}
-                </span>
+                {/* Nội dung chính phân tầng (Title trên, Progress bar dưới) */}
+                <div style={{ display: "flex", flexDirection: "column", flex: 1, minWidth: 0, justifyContent: "center" }}>
+                  <div style={{ display: "flex", alignItems: "center" }}>
+                    {/* Title */}
+                    <span className="tl-issue-title" title={issue.title} style={{ margin: 0, paddingBottom: (isEpic && childCount > 0) ? "2px" : "0" }}>
+                      {issue.title}
+                    </span>
 
-                {/* Progress bar cho Epic */}
-                {isEpic && childCount > 0 && (
-                  <div className="tl-epic-progress">
-                    <div className="tl-epic-progress-bar" style={{ width: `${progress}%` }} />
+                    {/* Action buttons (Bên phải title) */}
+                    {isEpic && (
+                      <div className="tl-row-actions">
+                        <button 
+                          className="tl-add-child-btn" 
+                          onClick={(e) => { e.stopPropagation(); handleStartChildCreate(issue._id); }}
+                          title="Create child work item"
+                        >
+                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                            <line x1="12" y1="5" x2="12" y2="19" />
+                            <line x1="5" y1="12" x2="19" y2="12" />
+                          </svg>
+                        </button>
+                      </div>
+                    )}
                   </div>
-                )}
+
+                  {/* Progress bar cho Epic - Hiển thị bên dưới nội dung chữ */}
+                  {isEpic && childCount > 0 && (
+                    <div className="tl-epic-progress" style={{ marginTop: "2px", width: "calc(100% - 30px)" }}>
+                      <div className="tl-epic-progress-bar" style={{ width: `${progress}%` }} />
+                    </div>
+                  )}
+                </div>
 
                 {/* Status badge */}
-                <span className={`tl-status-badge ${badge.cls}`}>
-                  {badge.label}
-                </span>
+                <div style={{ marginLeft: "12px", flexShrink: 0 }}>
+                  <span className={`tl-status-badge ${badge.cls}`}>
+                    {badge.label}
+                  </span>
+                </div>
               </div>
             );
           })}
@@ -442,8 +558,22 @@ const TimelinePage = ({ onCreateIssue, onEditIssue, onDeleteIssue, onShowToast }
 
             {/* Issue Rows */}
             {rows.map((row) => {
-              const { issue } = row;
-              const isEpic = row.type === "epic";
+              const { issue, type } = row;
+
+              // Đối với row form inline con thả xuống, chỉ vẽ grid background bên phải
+              if (type === "inline-child-form") {
+                return (
+                  <div key={row._id} className="gantt-row child">
+                    <div className="gantt-row-bg">
+                      {dateColumns.map((d, i) => (
+                        <div key={i} className={`gantt-grid-cell ${d.getDay() === 0 || d.getDay() === 6 ? "weekend" : ""}`} style={{ width: `${DAY_WIDTH}px` }} />
+                      ))}
+                    </div>
+                  </div>
+                );
+              }
+
+              const isEpic = type === "epic";
 
               // Tính bar: Epic dùng startDate/dueDate, child dùng sprint dates
               let barStyle = null;
@@ -451,7 +581,7 @@ const TimelinePage = ({ onCreateIssue, onEditIssue, onDeleteIssue, onShowToast }
                 barStyle = getBarStyle(issue.startDate, issue.dueDate);
               } else {
                 // Child: lấy ngày từ Sprint
-                const sprint = issue.sprint;
+                const sprint = issue?.sprint;
                 if (sprint && sprint.startDate && sprint.endDate) {
                   barStyle = getBarStyle(sprint.startDate, sprint.endDate);
                 }
