@@ -19,6 +19,8 @@ const CreateIssueModal = ({ isOpen, onClose, editIssue = null }) => {
     priority: "Medium",
     assignee: "",
     parentId: "",
+    startDate: "",
+    dueDate: "",
   });
   const [loading, setLoading] = useState(false);
   const [toast, setToast] = useState(null);
@@ -50,6 +52,8 @@ const CreateIssueModal = ({ isOpen, onClose, editIssue = null }) => {
         priority: editIssue.priority || "Medium",
         assignee: editIssue.assignee?._id || editIssue.assignee || "",
         parentId: editIssue.parentId?._id || editIssue.parentId || "",
+        startDate: editIssue.startDate ? editIssue.startDate.slice(0, 10) : "",
+        dueDate: editIssue.dueDate ? editIssue.dueDate.slice(0, 10) : "",
       });
     } else if (!isOpen) {
       setFormData({
@@ -60,6 +64,8 @@ const CreateIssueModal = ({ isOpen, onClose, editIssue = null }) => {
         priority: "Medium",
         assignee: "",
         parentId: "",
+        startDate: "",
+        dueDate: "",
       });
     }
   }, [isOpen, editIssue]);
@@ -102,6 +108,18 @@ const CreateIssueModal = ({ isOpen, onClose, editIssue = null }) => {
         submitData.parentId = formData.parentId;
       } else {
         submitData.parentId = null;
+      }
+
+      // Gửi startDate / dueDate (dùng cho Timeline)
+      if (formData.startDate) {
+        submitData.startDate = formData.startDate;
+      } else {
+        submitData.startDate = null;
+      }
+      if (formData.dueDate) {
+        submitData.dueDate = formData.dueDate;
+      } else {
+        submitData.dueDate = null;
       }
 
       if (isEditMode) {
@@ -333,6 +351,38 @@ const CreateIssueModal = ({ isOpen, onClose, editIssue = null }) => {
                       </option>
                     ))}
                   </select>
+                </div>
+              )}
+
+              {/* Ngày bắt đầu & Ngày kết thúc (cho Epic - phục vụ Timeline) */}
+              {formData.type === "Epic" && (
+                <div className="form-row">
+                  <div className="form-group">
+                    <label className="form-label" htmlFor="issue-start-date">
+                      📅 Ngày bắt đầu
+                    </label>
+                    <input
+                      type="date"
+                      id="issue-start-date"
+                      name="startDate"
+                      className="form-input"
+                      value={formData.startDate}
+                      onChange={handleChange}
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label className="form-label" htmlFor="issue-due-date">
+                      📅 Ngày kết thúc
+                    </label>
+                    <input
+                      type="date"
+                      id="issue-due-date"
+                      name="dueDate"
+                      className="form-input"
+                      value={formData.dueDate}
+                      onChange={handleChange}
+                    />
+                  </div>
                 </div>
               )}
             </div>

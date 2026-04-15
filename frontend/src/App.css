@@ -2084,3 +2084,520 @@
   color: #172b4d;
   margin-bottom: 8px;
 }
+
+/* ============================================= */
+/* ===== TIMELINE PAGE (Jira Roadmap) ===== */
+/* ============================================= */
+
+.timeline-page {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.timeline-header {
+  padding: 24px 32px 16px;
+  flex-shrink: 0;
+}
+
+/* Main split container */
+.timeline-container {
+  flex: 1;
+  display: flex;
+  overflow: hidden;
+  border-top: 1px solid var(--color-border);
+}
+
+/* ===== LEFT: Work List ===== */
+.timeline-work-list {
+  width: 380px;
+  min-width: 380px;
+  border-right: 2px solid var(--color-border);
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  background: #fff;
+}
+
+.timeline-work-header {
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
+  height: 62px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--color-text-muted);
+  border-bottom: 1px solid var(--color-border);
+  background: #fafbfc;
+  flex-shrink: 0;
+}
+
+/* Sprint label row */
+.timeline-work-row.sprint-row {
+  height: 36px;
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
+  border-bottom: 1px solid #f0f1f4;
+  background: #fafbfc;
+  flex-shrink: 0;
+}
+
+.timeline-sprint-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+/* Issue row */
+.timeline-work-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  height: 40px;
+  padding: 0 16px;
+  border-bottom: 1px solid #f0f1f4;
+  cursor: default;
+  flex-shrink: 0;
+  transition: background 0.1s ease;
+}
+
+.timeline-work-row:hover {
+  background: #f4f5f7;
+}
+
+.timeline-work-row.epic-row {
+  font-weight: 600;
+}
+
+.timeline-work-row.child-row {
+  font-weight: 400;
+  color: var(--color-text-secondary);
+}
+
+/* Toggle button */
+.tl-toggle-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  padding: 0;
+  color: var(--color-text-muted);
+  flex-shrink: 0;
+}
+
+.tl-toggle-btn svg {
+  width: 14px;
+  height: 14px;
+}
+
+.tl-toggle-btn:hover {
+  color: var(--color-text-primary);
+}
+
+.tl-toggle-spacer {
+  width: 20px;
+  flex-shrink: 0;
+}
+
+/* Type Icon */
+.tl-type-icon {
+  font-size: 14px;
+  flex-shrink: 0;
+  width: 18px;
+  text-align: center;
+}
+
+/* Issue Title */
+.tl-issue-title {
+  flex: 1;
+  font-size: 13px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: var(--color-text-primary);
+}
+
+/* Epic Progress Bar */
+.tl-epic-progress {
+  width: 40px;
+  height: 3px;
+  background: #dfe1e6;
+  border-radius: 2px;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+.tl-epic-progress-bar {
+  height: 100%;
+  background: #36b37e;
+  border-radius: 2px;
+  transition: width 0.3s ease;
+}
+
+/* Status Badge */
+.tl-status-badge {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 3px;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.tl-status-badge.todo {
+  background: #dfe1e6;
+  color: #5e6c84;
+}
+
+.tl-status-badge.inprogress {
+  background: #deebff;
+  color: #0052cc;
+}
+
+.tl-status-badge.test {
+  background: #eae6ff;
+  color: #5243aa;
+}
+
+.tl-status-badge.done {
+  background: #e3fcef;
+  color: #006644;
+}
+
+/* Create Epic Button */
+.tl-create-epic-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 16px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-text-muted);
+  font-family: var(--font-family);
+  transition: all 0.15s ease;
+  flex-shrink: 0;
+}
+
+.tl-create-epic-btn svg {
+  width: 16px;
+  height: 16px;
+}
+
+.tl-create-epic-btn:hover {
+  color: var(--color-accent);
+  background: #f4f5f7;
+}
+
+/* Inline Create Epic (giống Jira) */
+.tl-inline-create {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 12px;
+  margin: 4px 8px;
+  border: 2px solid #4c9aff;
+  border-radius: 4px;
+  background: #fff;
+  height: 40px;
+  box-sizing: border-box;
+  animation: fadeIn 0.15s ease;
+}
+
+.tl-inline-create .tl-type-icon {
+  flex-shrink: 0;
+}
+
+.tl-inline-input {
+  flex: 1;
+  border: none;
+  outline: none;
+  font-size: 14px;
+  font-family: var(--font-family);
+  color: var(--color-text-primary);
+  background: transparent;
+}
+
+.tl-inline-input::placeholder {
+  color: #a5adba;
+  font-style: normal;
+}
+
+.tl-inline-avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: #dfe1e6;
+  flex-shrink: 0;
+}
+
+.tl-inline-avatar svg {
+  width: 16px;
+  height: 16px;
+  color: #6b778c;
+}
+
+/* ===== RIGHT: Gantt Chart ===== */
+.timeline-gantt-wrapper {
+  flex: 1;
+  overflow-x: auto;
+  overflow-y: auto;
+  background: #fff;
+}
+
+.timeline-gantt {
+  position: relative;
+  min-height: 100%;
+}
+
+/* Month Header */
+.gantt-month-header {
+  display: flex;
+  height: 30px;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: #fafbfc;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.gantt-month-cell {
+  display: flex;
+  align-items: center;
+  padding: 0 8px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--color-text-secondary);
+  text-transform: capitalize;
+  border-right: 1px solid #ebebeb;
+  box-sizing: border-box;
+}
+
+/* Day Header */
+.gantt-day-header {
+  display: flex;
+  height: 32px;
+  position: sticky;
+  top: 30px;
+  z-index: 10;
+  background: #fafbfc;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.gantt-day-cell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--color-text-muted);
+  border-right: 1px solid #f0f1f4;
+  box-sizing: border-box;
+}
+
+.gantt-day-cell.today {
+  background: #deebff;
+  color: var(--color-accent);
+  font-weight: 700;
+}
+
+.gantt-day-cell.weekend {
+  background: #fafbfc;
+  color: #c1c7d0;
+}
+
+/* Gantt Row */
+.gantt-row {
+  position: relative;
+  height: 40px;
+  border-bottom: 1px solid #f0f1f4;
+}
+
+.gantt-row.sprint-track {
+  height: 36px;
+  background: #fafbfc;
+}
+
+/* Grid background cells */
+.gantt-row-bg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  pointer-events: none;
+}
+
+.gantt-grid-cell {
+  height: 100%;
+  border-right: 1px solid #f0f1f4;
+  box-sizing: border-box;
+}
+
+.gantt-grid-cell.weekend {
+  background: rgba(250, 251, 252, 0.6);
+}
+
+/* Sprint Pill */
+.gantt-sprint-pill {
+  position: absolute;
+  top: 6px;
+  height: 24px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  padding: 0 10px;
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  z-index: 5;
+  border: 1px solid var(--color-border);
+  background: #f4f5f7;
+  color: var(--color-text-secondary);
+}
+
+.gantt-sprint-pill.active {
+  background: #deebff;
+  border-color: #4c9aff;
+  color: var(--color-accent);
+}
+
+.gantt-sprint-pill.closed {
+  background: #e3fcef;
+  border-color: #57d9a3;
+  color: #006644;
+}
+
+/* Gantt Bar - Epic */
+.gantt-bar {
+  position: absolute;
+  top: 8px;
+  height: 24px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  padding: 0 10px;
+  cursor: pointer;
+  z-index: 5;
+  transition: box-shadow 0.15s ease, transform 0.1s ease;
+  overflow: hidden;
+}
+
+.gantt-bar:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  transform: translateY(-1px);
+}
+
+.gantt-bar.epic-bar {
+  background: linear-gradient(135deg, #b088f9, #9b6fef);
+  color: white;
+}
+
+.gantt-bar.child-bar {
+  background: linear-gradient(135deg, #c5b4f0, #b9a5e8);
+  color: white;
+  height: 20px;
+  top: 10px;
+  opacity: 0.85;
+}
+
+.gantt-bar.ghost-bar {
+  background: rgba(176, 136, 249, 0.25);
+  border: 2px dashed rgba(155, 111, 239, 0.5);
+  color: rgba(155, 111, 239, 0.6);
+  pointer-events: none;
+  animation: ghostPulse 1.5s ease-in-out infinite;
+}
+
+@keyframes ghostPulse {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 0.7; }
+}
+
+/* Drag Resize Handles */
+.gantt-bar-handle {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 8px;
+  cursor: ew-resize;
+  z-index: 10;
+  border-radius: 2px;
+  transition: background 0.15s ease;
+}
+
+.gantt-bar-handle.left {
+  left: 0;
+  border-radius: 4px 0 0 4px;
+}
+
+.gantt-bar-handle.right {
+  right: 0;
+  border-radius: 0 4px 4px 0;
+}
+
+.gantt-bar:hover .gantt-bar-handle {
+  background: rgba(255, 255, 255, 0.4);
+}
+
+.gantt-bar-handle:hover {
+  background: rgba(255, 255, 255, 0.7) !important;
+}
+
+/* Dragging state */
+.gantt-bar.dragging {
+  box-shadow: 0 0 0 2px #4c9aff, 0 4px 12px rgba(76, 154, 255, 0.3);
+  z-index: 20;
+  opacity: 0.9;
+}
+
+.gantt-bar-label {
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Today Line */
+.gantt-today-line {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: #ff5630;
+  z-index: 8;
+  pointer-events: none;
+}
+
+.gantt-today-line::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -4px;
+  width: 10px;
+  height: 10px;
+  background: #ff5630;
+  border-radius: 50%;
+}
+
