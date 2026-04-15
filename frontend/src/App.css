@@ -269,6 +269,95 @@
   color: var(--color-text-primary);
 }
 
+/* ===== Board Search Bar (Story 4.1) ===== */
+.board-search-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.board-search-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  max-width: 320px;
+  width: 100%;
+}
+
+.board-search-icon {
+  position: absolute;
+  left: 10px;
+  width: 16px;
+  height: 16px;
+  color: var(--color-text-muted);
+  pointer-events: none;
+  transition: color 0.2s ease;
+}
+
+.board-search-input-wrapper:focus-within .board-search-icon {
+  color: var(--color-accent);
+}
+
+.board-search-input {
+  width: 100%;
+  padding: 8px 34px 8px 34px;
+  border: 2px solid var(--color-border);
+  border-radius: 6px;
+  font-size: 13px;
+  font-family: var(--font-family);
+  color: var(--color-text-primary);
+  background: var(--color-bg-input);
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.board-search-input:focus {
+  border-color: var(--color-border-focus);
+  background: #ffffff;
+  box-shadow: 0 0 0 2px rgba(76, 154, 255, 0.2);
+}
+
+.board-search-input::placeholder {
+  color: var(--color-text-muted);
+  font-size: 13px;
+}
+
+.board-search-clear {
+  position: absolute;
+  right: 6px;
+  width: 22px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  padding: 0;
+  transition: all 0.15s ease;
+}
+
+.board-search-clear:hover {
+  background: rgba(222, 53, 11, 0.08);
+  color: var(--color-danger);
+}
+
+.board-search-clear svg {
+  width: 14px;
+  height: 14px;
+}
+
+.board-search-result-count {
+  font-size: 12px;
+  color: var(--color-text-muted);
+  font-weight: 500;
+  white-space: nowrap;
+  animation: fadeIn 0.2s ease;
+}
+
 /* ===== Board Columns ===== */
 .board-columns {
   display: flex;

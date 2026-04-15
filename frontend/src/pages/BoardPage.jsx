@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 import useIssueStore from "../store/useIssueStore";
 import useSprintStore from "../store/useSprintStore";
@@ -111,18 +111,26 @@ const BoardPage = ({ onCreateIssue, onEditIssue, onDeleteIssue, onShowToast }) =
   const reorderIssues = useIssueStore((state) => state.reorderIssues);
   const updateSprint = useSprintStore((state) => state.updateSprint);
   const [updatingId, setUpdatingId] = useState(null);
+  const [searchText, setSearchText] = useState("");
 
 
   const activeSprintId = issues.find(i => i.sprint && i.sprint.status === "Active")?.sprint?._id || null;
 
-  // Đếm số issue theo status (chỉ tính Active Sprint)
+  // Lọc issues theo từ khóa tìm kiếm (filter by title)
+  const filteredIssues = useMemo(() => {
+    if (!searchText.trim()) return issues;
+    const keyword = searchText.trim().toLowerCase();
+    return issues.filter((i) => i.title.toLowerCase().includes(keyword));
+  }, [issues, searchText]);
+
+  // Đếm số issue theo status (chỉ tính Active Sprint, đã lọc theo search)
   const getCountByStatus = (status) => {
-    return issues.filter((i) => i.status === status && i.sprint && i.sprint._id === activeSprintId).length;
+    return filteredIssues.filter((i) => i.status === status && i.sprint && i.sprint._id === activeSprintId).length;
   };
 
-  // Lấy issues theo status (chỉ tính Active Sprint)
+  // Lấy issues theo status (chỉ tính Active Sprint, đã lọc theo search)
   const getIssuesByStatus = (status) => {
-    return issues.filter((i) => i.status === status && i.sprint && i.sprint._id === activeSprintId);
+    return filteredIssues.filter((i) => i.status === status && i.sprint && i.sprint._id === activeSprintId);
   };
 
   // Xử lý sự kiện khi kéo thả xong
@@ -211,6 +219,42 @@ const BoardPage = ({ onCreateIssue, onEditIssue, onDeleteIssue, onShowToast }) =
               Tạo mới
             </button>
           </div>
+        </div>
+
+        {/* Search Input Box - Story 4.1 */}
+        <div className="board-search-bar">
+          <div className="board-search-input-wrapper" id="board-search-wrapper">
+            <svg className="board-search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="11" cy="11" r="8" />
+              <line x1="21" y1="21" x2="16.65" y2="16.65" />
+            </svg>
+            <input
+              type="text"
+              className="board-search-input"
+              id="board-search-input"
+              placeholder="Tìm kiếm issue theo tiêu đề..."
+              value={searchText}
+              onChange={(e) => setSearchText(e.target.value)}
+            />
+            {searchText && (
+              <button
+                className="board-search-clear"
+                id="board-search-clear-btn"
+                onClick={() => setSearchText("")}
+                title="Xóa tìm kiếm"
+              >
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <line x1="18" y1="6" x2="6" y2="18" />
+                  <line x1="6" y1="6" x2="18" y2="18" />
+                </svg>
+              </button>
+            )}
+          </div>
+          {searchText && (
+            <span className="board-search-result-count">
+              Tìm thấy {filteredIssues.filter(i => i.sprint && i.sprint._id === activeSprintId).length} kết quả
+            </span>
+          )}
         </div>
 
         {/* Stats */}
