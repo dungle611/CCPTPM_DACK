@@ -14,7 +14,7 @@ const getIssues = async (req, res) => {
     const issues = await Issue.find(filter)
       .populate("assignee", "name email avatar")
       .populate("parentId", "title type")
-      .populate("sprint", "name status")
+      .populate("sprint", "name status startDate endDate")
       .sort({ order: 1, createdAt: -1 });
 
     res.json(issues);
@@ -29,7 +29,7 @@ const getIssueById = async (req, res) => {
     const issue = await Issue.findById(req.params.id)
       .populate("assignee", "name email avatar")
       .populate("parentId", "title type")
-      .populate("sprint", "name status");
+      .populate("sprint", "name status startDate endDate");
 
     if (!issue) {
       return res.status(404).json({ message: "Không tìm thấy Issue" });
@@ -50,7 +50,7 @@ const createIssue = async (req, res) => {
     const populatedIssue = await Issue.findById(savedIssue._id)
       .populate("assignee", "name email avatar")
       .populate("parentId", "title type")
-      .populate("sprint", "name status");
+      .populate("sprint", "name status startDate endDate");
 
     res.status(201).json(populatedIssue);
   } catch (error) {
@@ -67,7 +67,7 @@ const updateIssue = async (req, res) => {
     })
       .populate("assignee", "name email avatar")
       .populate("parentId", "title type")
-      .populate("sprint", "name status");
+      .populate("sprint", "name status startDate endDate");
 
     if (!issue) {
       return res.status(404).json({ message: "Không tìm thấy Issue" });
