@@ -3,7 +3,8 @@ import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 import useIssueStore from "../store/useIssueStore";
 import useSprintStore from "../store/useSprintStore";
 import useUserStore from "../store/useUserStore";
-import { getAvatarInitials } from "../utils/helpers";
+import { getAvatarInitials, getAvatarColor } from "../utils/helpers";
+import IssueTypeIcon from "../components/IssueTypeIcon";
 
 const COLUMNS = [
   { key: "Todo", label: "Cần làm", indicator: "todo" },
@@ -58,7 +59,7 @@ const IssueCard = ({ issue, onEdit, onDelete, index }) => {
         >
           <div className="issue-card-top">
             <div className={`issue-card-type ${typeClass}`}>
-              {issue.type === "Epic" ? "⚡" : issue.type === "Story" ? "📖" : "✅"}{" "}
+              <IssueTypeIcon type={issue.type} size={14} />
               {issue.type}
             </div>
             {/* Nút Edit & Delete */}
@@ -94,7 +95,7 @@ const IssueCard = ({ issue, onEdit, onDelete, index }) => {
               {issue.priority}
             </div>
             {issue.assignee && (
-              <div className="issue-card-avatar" title={issue.assignee.name}>
+              <div className="issue-card-avatar" title={issue.assignee.name} style={{ background: getAvatarColor(issue.assignee.name) }}>
                 {getAvatarInitials(issue.assignee.name)}
               </div>
             )}
@@ -219,20 +220,20 @@ const BoardPage = ({ onCreateIssue, onEditIssue, onDeleteIssue, onShowToast }) =
   const getFilterOptions = (catKey) => {
     switch (catKey) {
       case "assignee":
-        return sprintAssignees.map((a) => ({ id: a._id, label: a.name, icon: "👤" }));
+        return sprintAssignees.map((a) => ({ id: a._id, label: a.name, icon: null }));
       case "status":
-        return COLUMNS.map((c) => ({ id: c.key, label: c.label, icon: c.key === "Todo" ? "📋" : c.key === "InProgress" ? "🔄" : c.key === "Test" ? "🧪" : "✅" }));
+        return COLUMNS.map((c) => ({ id: c.key, label: c.label, icon: null }));
       case "type":
         return [
-          { id: "Epic", label: "Epic", icon: "⚡" },
-          { id: "Story", label: "Story", icon: "📖" },
-          { id: "Task", label: "Task", icon: "✅" },
+          { id: "Epic", label: "Epic", icon: <IssueTypeIcon type="Epic" size={16} /> },
+          { id: "Story", label: "Story", icon: <IssueTypeIcon type="Story" size={16} /> },
+          { id: "Task", label: "Task", icon: <IssueTypeIcon type="Task" size={16} /> },
         ];
       case "priority":
         return [
-          { id: "High", label: "High", icon: "🔴" },
-          { id: "Medium", label: "Medium", icon: "🟡" },
-          { id: "Low", label: "Low", icon: "🟢" },
+          { id: "High", label: "High", icon: null },
+          { id: "Medium", label: "Medium", icon: null },
+          { id: "Low", label: "Low", icon: null },
         ];
       default:
         return [];
@@ -301,7 +302,7 @@ const BoardPage = ({ onCreateIssue, onEditIssue, onDeleteIssue, onShowToast }) =
           Dự án <span>/ Board</span>
         </div>
         <div className="board-header-top">
-          <h1 className="board-title">Kanban Board</h1>
+          <h1 className="board-title">Board</h1>
           <div style={{ display: 'flex', gap: '8px' }}>
             {activeSprintId && (
               <button className="sprint-btn primary" onClick={handleCompleteSprint}>
@@ -352,6 +353,7 @@ const BoardPage = ({ onCreateIssue, onEditIssue, onDeleteIssue, onShowToast }) =
                   id={`avatar-filter-${assignee._id}`}
                   onClick={() => handleToggleFilter("assignee", assignee._id)}
                   title={assignee.name}
+                  style={{ background: getAvatarColor(assignee.name) }}
                 >
                   <span className="board-avatar-filter-initial">
                     {getAvatarInitials(assignee.name)}

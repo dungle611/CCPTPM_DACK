@@ -3,7 +3,8 @@ import useIssueStore from "../store/useIssueStore";
 import useProjectStore from "../store/useProjectStore";
 import useUserStore from "../store/useUserStore";
 import useSprintStore from "../store/useSprintStore";
-import { getAvatarInitials } from "../utils/helpers";
+import { getAvatarInitials, getAvatarColor } from "../utils/helpers";
+import IssueTypeIcon from "./IssueTypeIcon";
 
 const IssueDetailModal = ({ issue, isOpen, onClose }) => {
   if (!isOpen || !issue) return null;
@@ -33,10 +34,10 @@ const IssueDetailModal = ({ issue, isOpen, onClose }) => {
 
   const getStatusLabel = (status) => {
     switch (status) {
-      case "Todo": return "📋 Cần làm";
-      case "InProgress": return "🔄 Đang làm";
-      case "Test": return "🧪 Kiểm thử";
-      case "Done": return "✅ Hoàn thành";
+      case "Todo": return "Cần làm";
+      case "InProgress": return "Đang làm";
+      case "Test": return "Kiểm thử";
+      case "Done": return "Hoàn thành";
       default: return status;
     }
   };
@@ -48,7 +49,7 @@ const IssueDetailModal = ({ issue, isOpen, onClose }) => {
         <div className="modal-header">
           <div className="modal-title">
             <div className={`detail-type-badge ${typeClass}`}>
-              {issue.type === "Epic" ? "⚡" : issue.type === "Story" ? "📖" : "✅"}
+              <IssueTypeIcon type={issue.type} size={16} />
               {issue.type}
             </div>
           </div>
@@ -93,7 +94,7 @@ const IssueDetailModal = ({ issue, isOpen, onClose }) => {
               <span className="detail-info-value">
                 {issue.assignee ? (
                   <span className="detail-assignee">
-                    <span className="detail-avatar-small" title={issue.assignee?.name}>
+                    <span className="detail-avatar-small" title={issue.assignee?.name} style={{ background: getAvatarColor(issue.assignee?.name) }}>
                       {getAvatarInitials(issue.assignee.name)}
                     </span>
                     {issue.assignee.name}

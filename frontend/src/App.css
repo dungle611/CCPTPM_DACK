@@ -3788,3 +3788,38 @@
   padding: 4px !important;
   font-size: 13px !important;
 }
+
+/* ================================================================
+   ISSUE TYPE ICON (SVG chuẩn Jira)
+   ================================================================ */
+
+.jira-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  line-height: 1;
+}
+
+.jira-icon svg {
+  display: block;
+  border-radius: 3px;
+}
+
+/* Đảm bảo icon trong issue-card-type căn chỉnh tốt với text */
+.issue-card-type .jira-icon,
+.table-type-badge .jira-icon,
+.detail-type-badge .jira-icon,
+.backlog-issue-left .jira-icon {
+  margin-right: 2px;
+}
+
+/* Icon trong filter options (thay cho emoji) */
+.jira-filter-option-icon .jira-icon {
+  vertical-align: middle;
+}
+
+/* Icon trong type selector của modal */
+.type-option-icon .jira-icon svg {
+  border-radius: 5px;
+}

@@ -2,6 +2,7 @@ import { useState, useMemo, useEffect, useRef } from "react";
 import useIssueStore from "../store/useIssueStore";
 import useSprintStore from "../store/useSprintStore";
 import useUserStore from "../store/useUserStore";
+import IssueTypeIcon from "../components/IssueTypeIcon";
 
 // Helpers tính toán ngày
 const DAY_WIDTH = 40; // px mỗi ngày
@@ -26,9 +27,7 @@ const getStatusBadge = (status) => {
 };
 
 const getTypeIcon = (type) => {
-  if (type === "Epic") return "⚡";
-  if (type === "Story") return "📖";
-  return "✅";
+  return <IssueTypeIcon type={type} size={14} />;
 };
 
 const TimelinePage = ({ onCreateIssue, onEditIssue, onDeleteIssue, onShowToast }) => {
@@ -367,8 +366,8 @@ const TimelinePage = ({ onCreateIssue, onEditIssue, onDeleteIssue, onShowToast }
                       value={childInlineType} 
                       onChange={(e) => setChildInlineType(e.target.value)}
                     >
-                      <option value="Task">☑️ Task</option>
-                      <option value="Story">📖 Story</option>
+                      <option value="Task">Task</option>
+                      <option value="Story">Story</option>
                     </select>
                     <input
                       ref={childInlineInputRef}
@@ -470,7 +469,7 @@ const TimelinePage = ({ onCreateIssue, onEditIssue, onDeleteIssue, onShowToast }
           {/* Create Epic - inline input (giống Jira) */}
           {isInlineCreating ? (
             <div className="tl-inline-create" id="tl-inline-create">
-              <span className="tl-type-icon epic">⚡</span>
+              <IssueTypeIcon type="Epic" size={14} />
               <input
                 ref={inlineInputRef}
                 type="text"

@@ -1,6 +1,6 @@
 // Sidebar.jsx - Thanh điều hướng bên trái kiểu Jira
 import useAuthStore from "../store/useAuthStore";
-import { getAvatarInitials } from "../utils/helpers";
+import { getAvatarInitials, getAvatarColor } from "../utils/helpers";
 
 const Sidebar = ({ onCreateIssue, activePage, onNavigate, projectName, projectKey, onBackToProjects }) => {
   const { user, logout } = useAuthStore();
@@ -121,7 +121,7 @@ const Sidebar = ({ onCreateIssue, activePage, onNavigate, projectName, projectKe
       {/* User Info + Logout */}
       <div className="sidebar-user-section">
         <div className="sidebar-user-info">
-          <div className="sidebar-user-avatar">
+          <div className="sidebar-user-avatar" style={{ background: getAvatarColor(user?.name) }}>
             <span>{getAvatarInitials(user?.name)}</span>
           </div>
           <span className="sidebar-user-name">{user?.name}</span>
