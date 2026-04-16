@@ -4,7 +4,8 @@ import IssueDetailModal from "../components/IssueDetailModal";
 import useProjectStore from "../store/useProjectStore";
 import useUserStore from "../store/useUserStore";
 import useSprintStore from "../store/useSprintStore";
-import { getAvatarInitials } from "../utils/helpers";
+import { getAvatarInitials, getAvatarColor } from "../utils/helpers";
+import IssueTypeIcon from "../components/IssueTypeIcon";
 
 const IssuesListPage = ({ onCreateIssue, onEditIssue, onDeleteIssue }) => {
   const issues = useIssueStore((state) => state.issues);
@@ -128,9 +129,9 @@ const IssuesListPage = ({ onCreateIssue, onEditIssue, onDeleteIssue }) => {
               id="filter-type"
             >
               <option value="">Tất cả</option>
-              <option value="Epic">⚡ Epic</option>
-              <option value="Story">📖 Story</option>
-              <option value="Task">✅ Task</option>
+              <option value="Epic">Epic</option>
+              <option value="Story">Story</option>
+              <option value="Task">Task</option>
             </select>
           </div>
 
@@ -143,10 +144,10 @@ const IssuesListPage = ({ onCreateIssue, onEditIssue, onDeleteIssue }) => {
               id="filter-status"
             >
               <option value="">Tất cả</option>
-              <option value="Todo">📋 Cần làm</option>
-              <option value="InProgress">🔄 Đang làm</option>
-              <option value="Test">🧪 Kiểm thử</option>
-              <option value="Done">✅ Hoàn thành</option>
+              <option value="Todo">Cần làm</option>
+              <option value="InProgress">Đang làm</option>
+              <option value="Test">Kiểm thử</option>
+              <option value="Done">Hoàn thành</option>
             </select>
           </div>
 
@@ -228,7 +229,7 @@ const IssuesListPage = ({ onCreateIssue, onEditIssue, onDeleteIssue }) => {
                 >
                   <td>
                     <span className={`table-type-badge ${issue.type.toLowerCase()}`}>
-                      {issue.type === "Epic" ? "⚡" : issue.type === "Story" ? "📖" : "✅"}{" "}
+                      <IssueTypeIcon type={issue.type} size={14} />
                       {issue.type}
                     </span>
                   </td>
@@ -249,7 +250,7 @@ const IssuesListPage = ({ onCreateIssue, onEditIssue, onDeleteIssue }) => {
                   <td>
                     {issue.assignee ? (
                       <span className="table-assignee">
-                        <span className="table-avatar" title={issue.assignee.name}>
+                        <span className="table-avatar" title={issue.assignee.name} style={{ background: getAvatarColor(issue.assignee.name) }}>
                           {getAvatarInitials(issue.assignee.name)}
                         </span>
                         {issue.assignee.name}

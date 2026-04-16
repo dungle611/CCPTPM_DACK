@@ -2,7 +2,8 @@ import { useEffect, useState } from "react";
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 import useIssueStore from "../store/useIssueStore";
 import useSprintStore from "../store/useSprintStore";
-import { getAvatarInitials } from "../utils/helpers";
+import { getAvatarInitials, getAvatarColor } from "../utils/helpers";
+import IssueTypeIcon from "../components/IssueTypeIcon";
 
 // Component hiển thị Issue theo dạng dòng (Row) trong Backlog
 const BacklogIssueRow = ({ issue, index, onEdit, onDelete }) => {
@@ -42,7 +43,7 @@ const BacklogIssueRow = ({ issue, index, onEdit, onDelete }) => {
         >
           <div className="backlog-issue-left">
             <div className={`issue-card-type inline ${typeClass}`}>
-              {issue.type === "Epic" ? "⚡" : issue.type === "Story" ? "📖" : "✅"}
+              <IssueTypeIcon type={issue.type} size={14} />
             </div>
             <span className="backlog-issue-key">{issue._id.substring(issue._id.length - 4).toUpperCase()}</span>
             <span className="backlog-issue-title">{issue.title}</span>
@@ -52,7 +53,7 @@ const BacklogIssueRow = ({ issue, index, onEdit, onDelete }) => {
               {getPriorityIcon(issue.priority)}
             </div>
             {issue.assignee && (
-              <div className="backlog-issue-avatar" title={issue.assignee.name}>
+              <div className="backlog-issue-avatar" title={issue.assignee.name} style={{ background: getAvatarColor(issue.assignee.name) }}>
                 {getAvatarInitials(issue.assignee.name)}
               </div>
             )}

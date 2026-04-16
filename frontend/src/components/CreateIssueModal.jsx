@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import useIssueStore from "../store/useIssueStore";
 import useUserStore from "../store/useUserStore";
 import useProjectStore from "../store/useProjectStore";
+import IssueTypeIcon from "./IssueTypeIcon";
 
 // Modal dùng chung cho cả Tạo mới và Chỉnh sửa Issue
 const CreateIssueModal = ({ isOpen, onClose, editIssue = null }) => {
@@ -239,7 +240,7 @@ const CreateIssueModal = ({ isOpen, onClose, editIssue = null }) => {
                       id={`type-option-${type.toLowerCase()}`}
                     >
                       <div className={`type-option-icon ${type.toLowerCase()}`}>
-                        {type === "Epic" ? "⚡" : type === "Story" ? "📖" : "✅"}
+                        <IssueTypeIcon type={type} size={20} />
                       </div>
                       <span className="type-option-label">{type}</span>
                     </button>
